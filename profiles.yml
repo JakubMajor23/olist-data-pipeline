@@ -4,9 +4,9 @@ postgres-dwh:
     dev:
       type: postgres
       host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
-      port: {{ env_var('POSTGRES_PORT', 5434) | int }}
+      port: "{{ env_var('POSTGRES_PORT', 5434) | int }}"
       user: "{{ env_var('POSTGRES_USER', 'dwh_user') }}"
-      pass: "{{ env_var('POSTGRES_PASSWORD', 'dwh_pass') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'dwh_pass') }}"
       dbname: "{{ env_var('POSTGRES_DB', 'dwh') }}"
       schema: dwh_main_dev
       threads: 4
