@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7b4e2289-d79b-43c7-b48e-e9092baa5e0f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/olist-data-pipeline.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analyses/find_duplicate_reviews.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_customers_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_geolocation_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_order_items_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_order_payments_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_order_reviews_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_orders_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_products_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/olist_sellers_dataset.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/product_category_name_translation.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dbt_project.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/init-scripts-dwh/create-dwh.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/init-scripts-olist/create-olist.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/init-scripts-olist/load-olist-data.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/notatki" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiles.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/run_monthly_el.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/seeds/order_statuses.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/seeds/payments_types.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/seeds/product_category_name_translation.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/assert_delivered_orders_are_approved.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/assert_delivered_orders_have_dates.sql" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+        <option value="SQL File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="350ZpNakBU8oZf8goOM1f2XWOzj" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.run_monthly_el.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/olist-data-pipeline&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.intellij.dbt.settings.DbtProjectConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\olist-data-pipeline" />
+      <recent name="D:\olist-data-pipeline\models\marts\dimensions" />
+      <recent name="D:\olist-data-pipeline\data" />
+      <recent name="D:\olist-data-pipeline\models" />
+      <recent name="D:\olist-data-pipeline\models\olist_dbt" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\olist-data-pipeline\models" />
+      <recent name="D:\olist-data-pipeline" />
+      <recent name="D:\olist-data-pipeline\olist_dbt\models" />
+      <recent name="D:\olist-data-pipeline\olist_dbt\seeds" />
+      <recent name="D:\olist-data-pipeline\init-scripts-dwh" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="run_monthly_el" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="olist-data-pipeline" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/run_monthly_el.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.run_monthly_el" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-PY-252.26199.168" />
+        <option value="bundled-python-sdk-b3d66beaba9a-c6efb3732140-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26199.168" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7b4e2289-d79b-43c7-b48e-e9092baa5e0f" name="Changes" comment="" />
+      <created>1762249131948</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1762249131948</updated>
+      <workItem from="1762249132959" duration="8796000" />
+      <workItem from="1762292082728" duration="1994000" />
+      <workItem from="1762296761111" duration="835000" />
+      <workItem from="1762341802776" duration="3000" />
+      <workItem from="1762358832554" duration="16523000" />
+      <workItem from="1762419085022" duration="2362000" />
+      <workItem from="1762510365497" duration="1951000" />
+      <workItem from="1762552446575" duration="26106000" />
+      <workItem from="1762791978880" duration="9755000" />
+      <workItem from="1762857742035" duration="33228000" />
+      <workItem from="1762945524721" duration="2080000" />
+      <workItem from="1762959310732" duration="18226000" />
+      <workItem from="1762990599116" duration="801000" />
+      <workItem from="1762992557497" duration="1051000" />
+      <workItem from="1763042499056" duration="25000" />
+      <workItem from="1763104103924" duration="1430000" />
+      <workItem from="1763105878764" duration="27314000" />
+      <workItem from="1763279684115" duration="16463000" />
+      <workItem from="1763404419840" duration="1274000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/olist_data_pipeline$run_monthly_el.coverage" NAME="run_monthly_el Coverage Results" MODIFIED="1763380975189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
+  </component>
+</project>

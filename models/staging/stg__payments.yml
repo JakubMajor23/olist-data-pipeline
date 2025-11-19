@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg__payments
+    description: "Staging model for order payments. Each row represents a single payment method used in an order (an order can have multiple payment methods)."
+    tests:
+      - dbt_expectations.expect_compound_columns_to_be_unique:
+          column_list: ["order_id", "payment_sequential"]
+
+    columns:
+      - name: order_id
+        description: "Identifier of the order this payment belongs to. Foreign key to stg__orders."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg__orders')
+                field: order_id
+
+      - name: payment_sequential
+        description: "The sequence number for a payment method within a single order (e.g., 1, 2, 3...)."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: payment_type
+        description: "The payment method used (e.g., credit_card, boleto, voucher)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['credit_card', 'boleto', 'voucher', 'debit_card', 'not_defined']
+              config:
+                severity: warn
+
+      - name: payment_installments
+        description: "The number of installments for this payment."
+        tests: &non_negative_test
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: payment_value
+        description: "The monetary value of this specific payment."
+        tests: *non_negative_test

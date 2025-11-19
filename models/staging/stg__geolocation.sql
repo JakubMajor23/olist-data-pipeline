@@ -1,0 +1,23 @@
+SELECT
+    CAST(geolocation_zip_code_prefix AS VARCHAR(10)) AS geolocation_zip_code_prefix ,
+    CAST(geolocation_lat AS DOUBLE PRECISION) AS geolocation_lat,
+    CAST(geolocation_lng AS DOUBLE PRECISION) AS geolocation_lng,
+    CAST(geolocation_city AS VARCHAR(50)) AS geolocation_city,
+    CAST(geolocation_state AS VARCHAR(2)) AS geolocation_state,
+    CASE
+        WHEN (geolocation_lat BETWEEN -34.0 AND 6.0)
+             AND (geolocation_lng BETWEEN -74.0 AND -34.0)
+        THEN TRUE
+        ELSE FALSE
+    END AS is_valid_brazilian_location
+FROM {{source('dwh', 'olist_geolocation_dataset')}}
+
+UNION ALL
+
+SELECT
+    '00000' AS geolocation_zip_code_prefix,
+    NULL AS geolocation_lat,
+    NULL AS geolocation_lng,
+    CAST('unknown' AS VARCHAR(50)) AS geolocation_city,
+    CAST('NA' AS VARCHAR(2)) AS geolocation_state,
+    FALSE AS is_valid_brazilian_location

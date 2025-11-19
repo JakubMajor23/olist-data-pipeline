@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg__customers
+    description: "Staging layer for customer data. Includes cleaning (trimming, case standardization) and handling of NULL values for city and state."
+
+    columns:
+      - name: customer_id
+        description: "Unique identifier for the customer entry associated with a *single order* (Primary Key). This ID links to the stg__orders table."
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_unique_id
+        description: "Identifier for the *person*. This ID groups all orders from the same customer (this is the true customer dimension key)."
+        tests:
+          - not_null
+
+      - name: customer_zip_code_prefix
+        description: "The first 5 digits of the customer's zip code."
+        tests:
+          - not_null
+
+      - name: customer_city
+        description: "Name of the customer's city. Standardized to lowercase and 'unknown' if NULL."
+        tests:
+          - not_null
+
+      - name: customer_state
+        description: "Two-letter abbreviation of the customer's state. Standardized to UPPERCASE and 'NA' if NULL."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO', 'NA']

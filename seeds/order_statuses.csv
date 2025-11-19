@@ -1,0 +1,9 @@
+order_status,is_final_status
+delivered,True
+shipped,False
+canceled,True
+invoiced,False
+processing,False
+approved,False
+unavailable,True
+created,False

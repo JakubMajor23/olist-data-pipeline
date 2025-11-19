@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_sellers
+    description: "Seller dimension (SCD Type 1). Contains one unique row per seller, joined with their primary geolocation."
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg__sellers')
+          config:
+            severity: warn
+
+    columns:
+      - name: seller_key
+        description: "Surrogate primary key for the seller dimension, generated as an MD5 hash of seller_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: seller_id
+        description: "Natural key (business key) from the source system. This is unique."
+        tests:
+          - unique
+          - not_null
+
+      - name: seller_zip_code_prefix
+        description: "The seller's 5-digit zip code prefix."
+        tests:
+          - not_null
+
+      - name: seller_city
+        description: "The seller's city."
+        tests:
+          - not_null
+
+      - name: seller_state
+        description: "The seller's state (2-letter abbreviation)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO']
+
+      - name: geolocation_key
+        description: "Foreign key linking to the dim__geolocation dimension."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_geolocation')
+                field: geolocation_key

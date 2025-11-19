@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: dim_reviews
+    description: "Review dimension table (SCD Type 1). Stores the descriptive text comments from customer reviews."
+
+    columns:
+      - name: review_key
+        description: "Surrogate primary key for the review dimension, generated as an MD5 hash of review_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: review_id
+        description: "Natural key (business key) from the source system."
+        tests:
+          - unique
+          - not_null
+
+      - name: review_comment_title
+        description: "The title of the review comment. 'No Title' if originally missing."
+        tests:
+          - not_null
+
+      - name: review_comment_message
+        description: "The full text of the review comment. 'No Comment' if originally missing."
+        tests:
+          - not_null

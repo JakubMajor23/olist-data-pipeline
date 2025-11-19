@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg__products
+    description: "Clean and translate staging layer for products."
+    columns:
+      - name: product_id
+        description: "Unique identifier for a product."
+        tests:
+          - unique
+          - not_null
+
+      - name: product_category_name_english
+        description: "Product category name in English."
+        tests:
+          - not_null
+
+      - name: product_name_length
+        description: "Length of the product name. NULLs are coerced to 0."
+        tests: &non_negative_test
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: product_description_length
+        description: "Length of the product description. NULLs are coerced to 0."
+        tests: *non_negative_test
+
+      - name: product_photos_qty
+        description: "Number of photos for the product. NULLs are coerced to 0."
+        tests: *non_negative_test
+
+      - name: product_weight_g
+        description: "The product's weight in grams."
+        tests: *non_negative_test
+
+      - name: product_length_cm
+        description: "The product's length in centimeters."
+        tests: *non_negative_test
+
+      - name: product_height_cm
+        description: "The product's height in centimeters."
+        tests: *non_negative_test
+
+      - name: product_width_cm
+        description: "The product's width in centimeters."
+        tests: *non_negative_test

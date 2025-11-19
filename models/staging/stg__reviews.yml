@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg__reviews
+    description: "Staging model for customer reviews, standardizing data types and handling missing comment/title values."
+
+    columns:
+      - name: review_id
+        description: "The unique identifier for a customer review."
+        tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        description: "The unique identifier of the order associated with the review. Used for relationship tests."
+        tests:
+          - not_null
+          - relationships:
+               to: ref('stg__orders')
+               field: order_id
+
+      - name: review_score
+        description: "The score given by the customer (1 to 5)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+              config:
+                severity: error
+
+      - name: review_comment_title
+        description: "The title of the review comment. 'No Title' if originally missing."
+
+
+      - name: review_comment_message
+        description: "The full text of the review comment. 'No Comment' if originally missing."
+
+      - name: review_creation_date
+        description: "The date the review was created."
+        tests:
+          - not_null
+
+      - name: review_answer_timestamp
+        description: "The timestamp when the seller responded to the review."
+        tests:
+          - not_null

@@ -1,0 +1,35 @@
+name: 'olist_dbt'
+version: '1.0.0'
+config-version: 2
+
+profile: 'postgres-dwh'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+seeds:
+  olist_dbt:
+    +tags: "lookup"
+
+models:
+  olist_dbt:
+    staging:
+      +materialized: view
+      +tags: "staging"
+    marts:
+      +materialized: table
+      dimensions:
+        +tags: "dimension"
+      facts:
+        +tags: "fact"
+      lookups:
+        +tags: ["dimension", "lookup"]

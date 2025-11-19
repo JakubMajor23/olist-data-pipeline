@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg__geolocation
+    description: "Staging layer for geolocation data. Casts data types and cleans up NULL values for city and state."
+
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: "The first 5 digits of the zip code. NOTE: This column is NOT unique in the source data, as one prefix can map to multiple coordinates."
+        tests:
+          - not_null
+
+      - name: geolocation_lat
+        description: "Latitude coordinate."
+        tests:
+          - not_null:
+              config:
+                where: "is_valid_brazilian_location = TRUE"
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: -34.0
+                max_value: 6.0
+              where: "is_valid_brazilian_location = TRUE"
+
+      - name: geolocation_lng
+        description: "Longitude coordinate."
+        tests:
+          - not_null:
+              config:
+                where: "is_valid_brazilian_location = TRUE"
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: -74.0
+                max_value: -34.0
+              where: "is_valid_brazilian_location = TRUE"
+
+      - name: geolocation_city
+        description: "City name associated with the zip code. 'unknown' if NULL in source."
+        tests:
+          - not_null
+
+      - name: geolocation_state
+        description: "Two-letter state abbreviation. 'NA' (Not Applicable) if NULL in source."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [
+                  'AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
+                  'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN',
+                  'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO',
+                  'NA'
+                ]
+
+      - name: is_valid_brazilian_location
+        description: "Is valid brazylian location or not"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [True, False]

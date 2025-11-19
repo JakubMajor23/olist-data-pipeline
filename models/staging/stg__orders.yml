@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg__orders
+    description: "Staging model for orders. Cleans, casts data, and includes imputation logic for 'delivered' orders that were missing an approval date."
+
+    columns:
+      - name: order_id
+        description: "Unique identifier for the order (Primary Key)."
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Identifier of the customer who placed the order (Foreign Key to stg__customers)."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+              to: ref('stg__customers')
+              field: customer_id
+
+      - name: order_status
+        description: "Status of the order (e.g., delivered, canceled)."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+              values: ['delivered', 'shipped', 'canceled', 'invoiced', 'processing', 'approved', 'unavailable', 'created']
+
+      - name: order_approved_at
+        description: "Timestamp when the payment was approved. Imputed with purchase time if status is 'delivered' but approval was NULL."
+
+      - name: is_approval_date_imputed
+        description: "Boolean flag (TRUE) if the 'order_approved_at' timestamp was imputed by our SQL logic."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [True, False]
+
+      - name: order_purchase_timestamp
+        description: "Timestamp when the order was placed by the customer."
+        tests:
+          - not_null
+
+      - name: order_estimated_delivery_date
+        description: "The estimated delivery date for the order."
+        tests:
+          - not_null
+
+      - name: order_delivered_carrier_date
+        description: "Timestamp when the order was handed over to the carrier. Can be NULL."
+        # Test (not_null) is omitted because the value is NULL for canceled or processing orders.
+
+      - name: order_delivered_customer_date
+        description: "Timestamp when the order was delivered to the customer. Can be NULL."
+        # Test (not_null) is omitted because the value is NULL for canceled or processing orders.

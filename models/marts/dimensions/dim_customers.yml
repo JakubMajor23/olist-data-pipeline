@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension (SCD Type 1), representing the latest known profile for each unique customer. Built from the last order timestamp."
+
+    columns:
+      - name: customer_key
+        description: "The surrogate primary key for the customer dimension, generated as an MD5 hash of customer_unique_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_unique_id
+        description: "The business key from the source system. This model is deduplicated on this key, so this column must also be unique."
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_city
+        description: "The customer's city, standardized to lowercase. 'unknown' if NULL in source."
+        tests:
+          - not_null
+
+      - name: customer_state
+        description: "The customer's state (2-letter abbreviation), standardized to UPPERCASE. 'NA' if NULL in source."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO', 'NA']
+
+      - name: geolocation_key
+        description: "The foreign key linking to the dim__geolocation dimension."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_geolocation')
+                field: geolocation_key

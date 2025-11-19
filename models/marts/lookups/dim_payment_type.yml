@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: dim_payment_type
+    description: "Dictionary dimension for payment types, loaded from the 'payment_types.csv' seed file."
+
+    columns:
+      - name: payment_type_key
+        description: "Surrogate Key (MD5 hash of the payment type)."
+        tests:
+          - unique
+          - not_null
+
+      - name: payment_type
+        description: "The business value for the payment type (Natural Key)."
+        tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ['credit_card', 'boleto', 'voucher', 'debit_card', 'not_defined']

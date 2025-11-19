@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg__sellers
+    description: "Staging model for seller information, transforming raw data types."
+
+    columns:
+      - name: seller_id
+        description: "The unique identifier of a seller."
+        tests:
+          - unique
+          - not_null
+
+      - name: seller_zip_code_prefix
+        description: "The first 5 digits of the seller's zip code."
+        tests:
+          - not_null
+
+      - name: seller_city
+        description: "The name of the city where the seller is located."
+        tests:
+          - not_null
+
+      - name: seller_state
+        description: "Two-letter abbreviation of the Brazilian state where the seller is located."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO']
+              config:
+                severity: warn

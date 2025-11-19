@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: dim_order_status
+    description: "Dictionary dimension for order statuses, loaded from the 'order_statuses.csv' seed file."
+
+    columns:
+      - name: order_status_key
+        description: "Surrogate Key (MD5 hash of the status)."
+        tests:
+          - unique
+          - not_null
+
+      - name: order_status
+        description: "The business value for the status (Natural Key)."
+        tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ['delivered', 'shipped', 'canceled', 'invoiced', 'processing', 'approved', 'unavailable', 'created']
+
+      - name: is_final_status
+        description: "Boolean flag (TRUE/FALSE) indicating if this is a terminal status for an order."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [True, False]
