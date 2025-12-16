@@ -54,37 +54,9 @@ System zaprojektowano modułowo, oddzielając warstwę symulacji od właściwego
 
 ### Cykl Życia Danych (End-to-End Flow)
 
-```mermaid
-graph LR
-    %% Style Definition
-    classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef process fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,rx:5,ry:5;
-    classDef script fill:#fff3e0,stroke:#e65100,stroke-width:2px,rx:5,ry:5;
-    classDef actor fill:#ffffff,stroke:#333,stroke-width:1px;
-
-    %% Actors & Scripts
-    User([Użytkownik / Skrypt]):::actor -->|1. Uruchom Demo| Sim[🐍 run_demo.py]:::script
-    
-    %% Phase 1: Simulation
-    subgraph "Faza 1: Generowanie"
-        direction TB
-        Sim -->|2. Wgranie Danych| Source[(Postgres<br>Source)]:::database
-        Sim -.->|3. Trigger API| Airflow
-    end
-
-    %% Phase 2: ELT Pipeline
-    subgraph "Faza 2: Pipeline ELT"
-        Source -- 4. Extract --> Airflow{Apache<br>Airflow}:::process
-        Airflow -- 5. Load --> Raw[(Postgres DWH<br>Schema: raw_data)]:::database
-        Airflow -->|6. Trigger| dbt[dbt Core]:::process
-    end
-
-    %% Phase 3: Analytics
-    subgraph "Faza 3: Analityka"
-        dbt -->|7. Transformacja| Marts[(Postgres DWH<br>Schema: marts)]:::database
-        Marts -->|8. Raportowanie| BI[BI Tool / SQL]:::actor
-    end
-```
+<div align="center">
+  <img src="readme_images/Personal%20Library%20Management-2025-12-16-173345.png" alt="Architektura systemu" width="100%">
+</div>
 
 ---
 

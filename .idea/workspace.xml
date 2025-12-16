@@ -4,78 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b4e2289-d79b-43c7-b48e-e9092baa5e0f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.sqlfluff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dags/olist_elt_dump_dag.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/dbt_project.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_geolocation.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_products.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_reviews.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__geolocation.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__order_items.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__orders.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__payments.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/olist_dbt/profiles.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/run_demo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/simulate_production.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/validate_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analyses/find_duplicate_reviews.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/analyses/find_duplicate_reviews.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbt_project.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/init-scripts-dwh/create-dwh.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/init-scripts-olist/load-olist-data.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_customers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_customers.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_customers.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_customers.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_date.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_date.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_date.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_date.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_geolocation.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_geolocation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_geolocation.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_products.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_products.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_products.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_reviews.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_reviews.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_reviews.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_sellers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_sellers.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/dimensions/dim_sellers.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/dimensions/dim_sellers.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_orders.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_orders.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_orders.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_orders.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_payments.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_payments.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_payments.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_payments.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_sales_items.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_sales_items.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/facts/fact_sales_items.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/facts/fact_sales_items.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/lookups/dim_order_status.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/lookups/dim_order_status.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/lookups/dim_order_status.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/lookups/dim_order_status.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/lookups/dim_payment_type.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/lookups/dim_payment_type.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/marts/lookups/dim_payment_type.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/marts/lookups/dim_payment_type.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/sources.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/sources.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__customers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__customers.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__customers.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__customers.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__geolocation.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__geolocation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__geolocation.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__order_items.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__order_items.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__order_items.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__orders.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__orders.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__orders.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__payments.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__payments.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__payments.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__products.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__products.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__products.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__products.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__reviews.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__reviews.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__reviews.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__reviews.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__sellers.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__sellers.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/staging/stg__sellers.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/models/staging/stg__sellers.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages.yml" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/packages.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiles.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/run_monthly_el.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/seeds/order_statuses.csv" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/seeds/order_statuses.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/seeds/payments_types.csv" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/seeds/payments_types.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/seeds/product_category_name_translation.csv" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/seeds/product_category_name_translation.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/assert_delivered_orders_are_approved.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/tests/assert_delivered_orders_are_approved.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/assert_delivered_orders_have_dates.sql" beforeDir="false" afterPath="$PROJECT_DIR$/olist_dbt/tests/assert_delivered_orders_have_dates.sql" afterDir="false" />
-    </list>
+    <list default="true" id="7b4e2289-d79b-43c7-b48e-e9092baa5e0f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -231,7 +160,7 @@
       <workItem from="1765742462346" duration="2433000" />
       <workItem from="1765750163017" duration="10972000" />
       <workItem from="1765822286643" duration="21133000" />
-      <workItem from="1765902978032" duration="1928000" />
+      <workItem from="1765902978032" duration="2529000" />
     </task>
     <servers />
   </component>
