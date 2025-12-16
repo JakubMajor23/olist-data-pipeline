@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🇧🇷 Olist E-commerce Data Pipeline
+# Olist E-commerce Data Pipeline
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.7%2B-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white)
@@ -23,7 +23,7 @@
 
 ## 💡 Kontekst i Cele
 
-**Problem:** Surowe dane Olist to rozproszone logi transakcyjne – analiza przychodu, opóźnień czy retencji wymaga łączenia 7+ tabel i jest nieefektywna w czasie rzeczywistym.
+**Problem:** Surowe dane Olist to rozproszone logi transakcyjne – analiza przychodu, opóźnień czy retencji wymaga łączenia wielu tabel i jest nieefektywna w czasie rzeczywistym.
 
 **Rozwiązanie:** Zautomatyzowany potok danych przekształcający surowe logi w czysty model **Galaxy Schema** (Konstelacja Faktów) w Hurtowni Danych.
 
@@ -83,20 +83,20 @@ Relacja Jeden-do-Wielu (1 zamówienie = wiele produktów = wiele rat) prowadził
 
 ```bash
 .
-├── dags/                   # 🌪️ Definicje DAG-ów Airflow
+├── dags/                   # Definicje DAG-ów Airflow
 │   └── olist_elt_dump_dag.py
-├── olist_dbt/              # 🧱 Projekt transformacji dbt
+├── olist_dbt/              # Projekt transformacji dbt
 │   ├── models/
 │   │   ├── staging/        # Modele pośrednie (Source & Cleaning)
 │   │   └── marts/          # Modele biznesowe (Galaxy Schema)
 │   ├── seeds/              # Pliki statyczne (CSV)
 │   └── dbt_project.yml
-├── scripts/                # 🐍 Skrypty pomocnicze
+├── scripts/                # Skrypty pomocnicze
 │   ├── run_demo.py         # Orkiestrator symulacji
 │   ├── simulate_production.py
 │   └── validate_data.py
-├── docker-compose.yml      # 🐳 Definicja infrastruktury
-├── requirements.txt        # 📦 Zależności Python
+├── docker-compose.yml      # Definicja infrastruktury
+├── requirements.txt        # Zależności Python
 └── README.md
 ```
 
