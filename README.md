@@ -128,6 +128,15 @@ Konfiguracja DAG-ów implementuje podejście **Fail-Fast**.
 Skrypt symulujący produkcję (`simulate_production.py`) nie jest prostym ładowaniem CSV.
 * **Logika:** Implementuje graf zależności, ładując dane w ścisłej kolejności (Klienci → Zamówienia → Pozycje/Płatności), co emuluje zachowanie prawdziwego systemu transakcyjnego dbającego o Referencyjną Integralność (Foreign Keys).
 
+### 8. Inteligentna Imputacja Danych (Data Repair)
+W warstwie Staging (`stg__orders`) zaimplementowano logikę naprawczą dla niespójnych danych.
+* **Problem:** Niektóre zamówienia o statusie `delivered` nie posiadały daty zatwierdzenia (`order_approved_at`).
+* **Rozwiązanie:** System automatycznie imputuje brakującą datę (przyjmując datę zakupu) oraz dodaje flagę audytową `is_approval_date_imputed`, co pozwala analitykom odróżnić dane rzeczywiste od naprawionych.
+
+### 9. Optymalizacja Modelu (Outrigger Dimensions)
+Zamiast powielać pełne dane adresowe w wymiarach Klientów i Sprzedawców, zastosowano technikę **Outrigger Dimension**.
+* **Logika:** Wymiar `dim_geolocation` działa jako znormalizowany słownik przypięty do innych wymiarów. Zmniejsza to redundancję danych i pozwala na centralne zarządzanie logiką czyszczenia koordynatów GPS.
+
 ---
 
 ## Model Danych
