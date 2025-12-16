@@ -116,6 +116,18 @@ Klienci w systemie Olist mogą zmieniać adresy.
 ### 4. Ciągłość Czasowa (Date Spine)
 Wymiar czasu `dim_date` nie powstał z danych transakcyjnych (co powodowałoby luki w dniach bez sprzedaży), lecz został wygenerowany algorytmicznie za pomocą pakietu `dbt_utils`. Gwarantuje to poprawność analiz typu "Running Total" czy "Year-over-Year".
 
+### 5. Idempotentność Transakcyjna (Airflow Savepoints)
+Pipeline ELT jest w pełni idempotentny — ponowne uruchomienie tego samego DAG-a nie powoduje duplikatów.
+* **Technika:** Zastosowano mechanizm `begin_nested()` (PostgreSQL Savepoints) w PythonOperatorze. Przed załadowaniem partii danych, system usuwa stare rekordy dla danego okresu (DELETE), a w razie błędu transakcja jest bezpiecznie wycofywana, nie naruszając pozostałych danych.
+
+### 6. Strategia Fail-Fast (Security)
+Konfiguracja DAG-ów implementuje podejście **Fail-Fast**.
+* **Bezpieczeństwo:** System celowo przerywa działanie (`raise RuntimeError`) już na poziomie importów, jeśli brakuje krytycznych zmiennych środowiskowych (np. haseł do bazy). Zapobiega to "cichemu" działaniu aplikacji na domyślnych lub niebezpiecznych ustawieniach.
+
+### 7. Symulacja Więzów Integralności (Foreign Keys)
+Skrypt symulujący produkcję (`simulate_production.py`) nie jest prostym ładowaniem CSV.
+* **Logika:** Implementuje graf zależności, ładując dane w ścisłej kolejności (Klienci → Zamówienia → Pozycje/Płatności), co emuluje zachowanie prawdziwego systemu transakcyjnego dbającego o Referencyjną Integralność (Foreign Keys).
+
 ---
 
 ## Model Danych
