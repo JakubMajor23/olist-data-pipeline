@@ -1,20 +1,99 @@
-services:
-  # Data base 2: Olist
-  postgres-olist-source:
-      image: postgres:16
-      container_name: postgres-olist-source
-      environment:
-        - POSTGRES_USER=${SOURCE_POSTGRES_USER}
-        - POSTGRES_PASSWORD=${SOURCE_POSTGRES_PASSWORD}
-        - POSTGRES_DB=${SOURCE_POSTGRES_DB}
-      ports:
-        - "5433:5432" # Host: 5433 -> Container: 5432
-      volumes:
-        - olist_source_data:/var/lib/postgresql/data
-        - ./init-scripts-olist:/docker-entrypoint-initdb.d
-        - ./data:/data-csv
+version: '3.8'
 
-  # Data base 3: Data Warehouse
+x-airflow-common: &airflow-common
+  # ZMIANA 1: Zamiast 'image', używamy 'build', żeby zainstalować dbt z Twojego Dockerfile
+  build: .
+  env_file: 
+    - .env
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow-meta/airflow
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    - AIRFLOW_CONN_POSTGRES_DWH=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-dwh:5432/${POSTGRES_DB}
+    - DBT_PROFILES_DIR=/opt/airflow/olist_dbt
+    - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    - AIRFLOW__WEBSERVER__SECRET_KEY=my_super_secret_key_fix_403
+    - SOURCE_POSTGRES_USER=${SOURCE_POSTGRES_USER}
+    - SOURCE_POSTGRES_PASSWORD=${SOURCE_POSTGRES_PASSWORD}
+    - SOURCE_POSTGRES_DB=${SOURCE_POSTGRES_DB}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./scripts:/opt/airflow/scripts
+    - ./olist_dbt:/opt/airflow/olist_dbt
+  depends_on:
+    - postgres-airflow-meta
+
+services:
+  # --- USŁUGA 1: Inicjalizacja (Niezbędna przy pierwszym uruchomieniu!) ---
+  airflow-init:
+    <<: *airflow-common
+    command: version
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow-meta/airflow
+      # Tworzy domyślnego użytkownika admin/admin
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=airflow
+      - _AIRFLOW_WWW_USER_PASSWORD=airflow
+    depends_on:
+      - postgres-airflow-meta
+
+  # --- USŁUGA 2: Webserver ---
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      - airflow-init # Czekaj, aż init skończy tworzyć tabele!
+
+  # --- USŁUGA 3: Scheduler ---
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "airflow", "jobs", "check", "--job-type", "SchedulerJob", "--hostname", "${HOSTNAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      - airflow-init
+
+  # --- BAZA 1: Metadane Airflow ---
+  postgres-airflow-meta:
+    image: postgres:16
+    container_name: postgres-airflow-meta
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - airflow_meta_data:/var/lib/postgresql/data
+
+  # --- BAZA 2: Olist Source (Produkcja) ---
+  postgres-olist-source:
+    image: postgres:16
+    container_name: postgres-olist-source
+    environment:
+      - POSTGRES_USER=${SOURCE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${SOURCE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${SOURCE_POSTGRES_DB}
+    ports:
+      - "5433:5432" # Host: 5433 -> Wewnątrz: 5432
+    volumes:
+      - olist_source_data:/var/lib/postgresql/data
+      # Jeśli masz skrypt SQL do inicjalizacji, odkomentuj:
+      - ./init-scripts-olist:/docker-entrypoint-initdb.d
+      - ./data:/data-csv
+
+  # --- BAZA 3: Data Warehouse (Docelowa) ---
   postgres-dwh:
     image: postgres:16
     container_name: postgres-dwh
@@ -23,11 +102,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "5434:5432" # Host: 5434 -> Kontener: 5432
+      - "5434:5432" # Host: 5434 -> Wewnątrz: 5432
     volumes:
       - dwh_data:/var/lib/postgresql/data
-      - ./init-scripts-dwh:/docker-entrypoint-initdb.d
+      - ./data:/data-csv
 
 volumes:
   olist_source_data:
   dwh_data:
+  airflow_meta_data:

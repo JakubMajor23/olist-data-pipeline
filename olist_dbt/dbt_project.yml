@@ -1,0 +1,61 @@
+name: 'olist_dbt'
+version: '1.0.0'
+config-version: 2
+
+profile: 'olist_project'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+seeds:
+  olist_dbt:
+    +tags: "lookup"
+
+models:
+  olist_dbt:
+    # Domyślnie wszystko w projekcie to widok (bezpiecznie)
+    +materialized: view
+    
+    staging:
+      # 1. Domyślna strategia dla całego folderu 'staging' to TABLE.
+      # Dzięki temu produkty, sprzedawcy, geo będą szybkie, ale zawsze świeże (Full Refresh).
+      +materialized: table
+      +tags: "staging"
+
+      # 2. Wyjątki dla konkretnych modeli (Wielka Czwórka)
+      # Tutaj nadpisujemy ustawienie 'table' na 'incremental'
+      stg__orders:
+        +materialized: incremental
+        +unique_key: order_id
+      
+      stg__order_items:
+        +materialized: incremental
+        # Tu uwaga: order_items nie ma jednego ID, kluczem jest para.
+        # W Postgresie dbt incremental bez unique_key działa jako "append-only" (dopisuje).
+        # Jeśli chcesz aktualizacji, musisz zdefiniować klucz złożony (ale to trudniejsze).
+        # Na start 'append' wystarczy, jeśli dane się nie zmieniają wstecznie.
+      
+      stg__payments:
+        +materialized: incremental
+      
+      stg__reviews:
+        +materialized: incremental
+        +unique_key: review_id
+
+    marts:
+      +materialized: table
+      dimensions:
+        +tags: "dimension"
+      facts:
+        +tags: "fact"
+      lookups:
+        +tags: ["dimension", "lookup"]

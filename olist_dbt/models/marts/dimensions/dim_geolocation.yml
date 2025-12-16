@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: dim_geolocation
+    description: "Geolocation dimension. De-duplicated from staging data. Each zip code prefix is unique. Latitude/Longitude are averaged, and city/state are set to the most common value for that prefix."
+
+    columns:
+      - name: geolocation_key
+        description: "The surrogate primary key for the geolocation dimension, generated as an MD5 hash of the zip code prefix."
+        tests:
+          - unique
+          - not_null
+
+      - name: geolocation_zip_code_prefix
+        description: "The business key (5-digit zip code prefix). This is unique in this dimension."
+        tests:
+          - unique
+          - not_null
+
+      - name: geolocation_lat
+        description: "The *average* latitude for all coordinates associated with the zip code prefix."
+        tests:
+          - not_null:
+              config:
+                where: "is_valid_brazilian_location = TRUE"
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: -34.0
+                max_value: 6.0
+              where: "is_valid_brazilian_location = TRUE"
+
+      - name: geolocation_lng
+        description: "The *average* longitude for all coordinates associated with the zip code prefix."
+        tests:
+          - not_null:
+              config:
+                where: "is_valid_brazilian_location = TRUE"
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: -74.0
+                max_value: -34.0
+              where: "is_valid_brazilian_location = TRUE"
+
+      - name: geolocation_city
+        description: "The *most common* city name associated with the zip code prefix. 'unknown' if NULL in source."
+        tests:
+          - not_null
+
+      - name: geolocation_state
+        description: "The *most common* 2-letter state abbreviation associated with the zip code prefix. 'NA' if NULL in source."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO', 'NA','unknown']
+
+      - name: is_valid_brazilian_location
+        description: "Is valid brazylian location or not"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [True, False]

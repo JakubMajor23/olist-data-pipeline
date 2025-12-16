@@ -1,0 +1,30 @@
+olist_project:
+  # Domyślny target 'local' jest super dla Twojej pracy na Windowsie (CLI, SQLFluff)
+  target: local
+
+  outputs:
+    # --- KONFIGURACJA 1: LOKALNA (Windows) ---
+    local:
+      type: postgres
+      threads: 1
+      host: localhost
+      port: 5434            # Port zewnętrzny (Windows)
+      user: olist
+      password: olist       # ZMIANA: 'password' zamiast 'pass'
+      dbname: olist_dwh
+      schema: dwh_main_dev  # Tu trafią tabele jak odpalasz dbt z komputera
+
+    # --- KONFIGURACJA 2: DOCKER (Airflow) ---
+    docker:
+      type: postgres
+      threads: 4
+      host: postgres-dwh    # Host wewnętrzny (Docker service name)
+      port: 5432            # Port wewnętrzny (Standardowy Postgres)
+
+      # ZMIANA: Pobieramy dane ze zmiennych środowiskowych Airflowa
+      # Drugi argument (np. 'olist') to wartość domyślna (bezpiecznik)
+      user: "{{ env_var('POSTGRES_USER', 'olist') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'olist') }}" # ZMIANA: 'password'
+      dbname: "{{ env_var('POSTGRES_DB', 'olist_dwh') }}"
+
+      schema: dwh_main_prod # Tu trafią tabele jak odpali to Airflow

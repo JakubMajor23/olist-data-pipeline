@@ -1,1 +1,12 @@
+# --- Core Data Tools ---
 dbt-postgres>=1.8.0
+pandas
+sqlalchemy
+psycopg2-binary
+
+# --- Security & Config ---
+python-dotenv
+
+# --- Code Quality ---
+sqlfluff
+sqlfluff-templater-dbt

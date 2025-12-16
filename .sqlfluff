@@ -1,0 +1,12 @@
+[sqlfluff]
+dialect = postgres
+templater = dbt
+runaway_limit = 10
+max_line_length = 120
+indent_unit = space
+exclude_rules = ST06, ST09
+
+[sqlfluff:templater:dbt]
+project_dir = ./olist_dbt
+profiles_dir = ./olist_dbt
+target = local
