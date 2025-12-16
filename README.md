@@ -28,9 +28,9 @@
 **Rozwiązanie:** Zautomatyzowany potok danych przekształcający surowe logi w czysty model **Galaxy Schema** (Konstelacja Faktów) w Hurtowni Danych.
 
 ### Główne Cele
-- **🎯 Single Source of Truth:** Centralizacja danych o Zamówieniach, Płatnościach i Produktach.
-- **📈 Skalowalność:** Ładowanie przyrostowe (Incremental Loading) dla obsługi rosnącego wolumenu danych.
-- **🛡️ Jakość Danych:** Integralność referencyjna, brak duplikatów (Idempotentność) i testy `dbt`.
+- **Single Source of Truth:** Centralizacja danych o Zamówieniach, Płatnościach i Produktach.
+- **Skalowalność:** Ładowanie przyrostowe (Incremental Loading) dla obsługi rosnącego wolumenu danych.
+- **Jakość Danych:** Integralność referencyjna, brak duplikatów (Idempotentność) i testy `dbt`.
 
 ---
 
