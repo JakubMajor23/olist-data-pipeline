@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.7%2B-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white)
 ![dbt](https://img.shields.io/badge/dbt--Core-FF694B?style=for-the-badge&logo=dbt&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker--Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 <br>
@@ -34,52 +34,40 @@
 
 ---
 
-## 🛠 Zastosowane Wzorce i Technologie
+## Zastosowane Wzorce i Technologie
 
 Projekt realizuje zasady inżynierii danych (**Modern Data Stack**) poprzez:
 
 | Obszar | Implementacja |
 | :--- | :--- |
-| **Orkiestracja** | **Event-Driven Airflow**: Wyzwalanie DAG-ów przez REST API, obsługa `execution_date` dla backfillingu. |
-| **Modelowanie** | **Galaxy Schema**: Architektura Konstelacji Faktów eliminująca problem Fan-out (Cartesian Product). |
-| **Transformacja** | **dbt & Analytics Engineering**: Modele przyrostowe, makra Jinja (DRY), testy generyczne (`unique`, `not_null`). |
-| **Infrastruktura** | **Docker & 12-Factor App**: Pełna konteneryzacja, separacja konfiguracji, strategia Fail-Fast. |
-| **Spójność** | **ACID & Idempotentność**: Atomowe operacje zapisu, mechanizmy *delete-insert* gwarantujące spójność. |
+| **Orkiestracja** | **Event-Driven Airflow**: Wyzwalanie DAG-ów przez REST API zaraz po pojawieniu się nowych danych (symulacja). |
+| **Modelowanie** | **Galaxy Schema**: Architektura Konstelacji Faktów (3 tabele faktów) eliminująca problem *Fan-out* i iloczynu kartezjańskiego. |
+| **Transformacja** | **dbt Core**: Modele zmaterializowane jako `incremental` oraz `table`, makra Jinja (DRY), testy jakości danych. |
+| **Jakość Kodu** | **SQLFluff**: Linter SQL zapewniający spójny styl kodu (zgodnie z plikiem `.sqlfluff`). |
+| **Infrastruktura** | **Docker & Docker Compose**: Pełna konteneryzacja Airflow (z dbt) oraz bazy danych Postgres. |
 
 ---
 
-## 🏗 Architektura i Przepływ Danych
+## Architektura i Przepływ Danych
 
 System zaprojektowano modułowo, oddzielając warstwę symulacji od właściwego przetwarzania.
 
 ### Cykl Życia Danych (End-to-End Flow)
 
-<div align="center">
-  <img src="readme_images/Personal%20Library%20Management-2025-12-16-173345.png" alt="Architektura systemu" width="100%">
-</div>
-
 ---
 
-## 🧩 Model Danych i Wyzwania
+## Model Danych i Wyzwania
 
 ### Model Galaxy Schema
 Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele faktów współdzielą wymiary (*conformed dimensions*).
 
-### Rozwiązane Problemy
-
-#### 1. Obsługa "Fan-Out" (Eksplozja Wierszy)
-Relacja Jeden-do-Wielu (1 zamówienie = wiele produktów = wiele rat) prowadziła do błędnych sum przy denormalizacji.
-✅ **Rozwiązanie:** Podział na trzy dedykowane Tabele Faktów:
-- `fact_orders`: Analiza dostaw i statusów.
-- `fact_sales_items`: Analiza produktowa.
-- `fact_payments`: Analiza finansowa.
-
-#### 2. Spójność Danych Klienta
-✅ **Rozwiązanie:** Zastosowanie **Bridge Table** w `dbt` do mapowania `customer_id` (sesja) na `customer_unique_id` (osoba), tworząc Single Customer View.
+<div align="center">
+  <img src="readme_images/dwh.png" alt="Architektura systemu" width="100%">
+</div>
 
 ---
 
-## 📂 Struktura Projektu
+## Struktura Projektu
 
 ```bash
 .
@@ -102,7 +90,7 @@ Relacja Jeden-do-Wielu (1 zamówienie = wiele produktów = wiele rat) prowadził
 
 ---
 
-## 🚀 Instrukcja Uruchomienia
+## Instrukcja Uruchomienia
 
 ### Wymagania
 * Docker & Docker Compose
@@ -141,7 +129,7 @@ python scripts/run_demo.py
 
 ---
 
-## 📊 Roadmapa i Status
+## Roadmapa i Status
 
 - [x] **Infrastruktura**: Dockerized Airflow & Postgres.
 - [x] **Logika ELT**: Custom Python Operators z transakcyjną spójnością.
