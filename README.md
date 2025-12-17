@@ -58,24 +58,23 @@ System zaprojektowano modułowo, oddzielając warstwę symulacji od właściwego
 Proces symuluje rzeczywiste działanie hurtowni danych w trybie przyrostowym (Incremental Load):
 
 1.  **Symulacja Transakcji (`simulate_production.py`):**
-    * Skrypt pobiera dane z plików CSV odpowiadające konkretnemu miesiącowi (np. styczeń 2017).
-    * Dane są ładowane do operacyjnej bazy danych (`postgres-olist-source`), zachowując więzy integralności (najpierw Klienci, potem Zamówienia, na końcu Płatności/Recenzje).
+    Skrypt pobiera dane historyczne (miesiąc po miesiącu) i ładuje je do operacyjnej bazy danych (`postgres-olist-source`), zachowując ścisłe więzy integralności (Klienci → Zamówienia → Płatności).
 
 2.  **Trigger API (`run_demo.py`):**
-    * Natychmiast po załadowaniu danych, orkiestrator wysyła zapytanie POST do REST API Airflow.
-    * Przekazuje parametr `logical_date`, co pozwala na precyzyjne przetworzenie tylko nowego wycinka czasu.
+    Natychmiast po załadowaniu danych, orkiestrator wysyła zapytanie POST do REST API Airflow, przekazując `logical_date`. Pozwala to na precyzyjne przetworzenie tylko nowego wycinka czasu.
 
 3.  **Extract & Load (Airflow DAG):**
-    * **Idempotentność:** Przed załadowaniem, DAG usuwa z warstwy `raw_data` wszelkie dane dla przetwarzanego miesiąca. Zapobiega to duplikatom w przypadku ponownego uruchomienia.
+    * **Idempotentność:** Przed załadowaniem, DAG usuwa z warstwy `raw_data` wszelkie dane dla przetwarzanego miesiąca, zapobiegając duplikatom.
     * **Transfer:** Dane są przenoszone z bazy źródłowej do hurtowni (Raw Layer) przy użyciu wydajnych silników SQLAlchemy.
 
 4.  **Transformacja (dbt):**
-    * Airflow uruchamia kontener z dbt (`dbt run`).
-    * Dane surowe są czyszczone (Staging) i modelowane do postaci tabel faktów i wymiarów (Marts).
+    Airflow uruchamia kontener z dbt (`dbt run`). Dane surowe są czyszczone (Staging) i modelowane do postaci tabel faktów i wymiarów (Marts).
 
-5.  **Walidacja:**
-    * Na końcu `run_demo.py` uruchamiany jest skrypt weryfikujący zgodność liczby wierszy między źródłem a hurtownią.
+5.  **Walidacja (`validate_data.py`):**
+    Na samym końcu symulacji (`run_demo.py`) uruchamiany jest skrypt QA. Weryfikuje on integralność danych, porównując liczbę wierszy między oryginalnymi plikami CSV a **bazą źródłową**, aby potwierdzić, że symulacja przebiegła bez utraty danych.
+
 ---
+
 ## 🛠️ Szczegóły Transformacji (dbt)
 
 Warstwa transformacji została podzielona na dwa etapy zgodnie z dobrymi praktykami Analytics Engineering:
@@ -95,47 +94,28 @@ Model **Galaxy Schema** łączy procesy biznesowe przez wspólne wymiary (*Confo
 
 ---
 
-## 🌟 Wyróżniające Rozwiązania Techniczne
+## 🌟 Ważne Rozwiązania Techniczne
 
-Projekt implementuje zaawansowane wzorce inżynieryjne, wykraczające poza standardowe kursy ETL:
+Projekt implementuje zaawansowane wzorce inżynierii danych, wykraczające poza standardowe kursy ETL.
 
-### 1. Zaawansowane Modelowanie (Ghost Records)
-W tabelach wymiarów (np. `dim_products`, `dim_reviews`) zastosowano tzw. **Ghost Records**.
-* **Problem:** Brak spójności referencyjnej (np. zamówienie produktu, którego nie ma w bazie produktów) powoduje utratę wierszy przy `INNER JOIN`.
-* **Rozwiązanie:** Sztuczny rekord z kluczem `MD5('unknown')`. Błędne klucze obce są mapowane do kategorii "Unknown" zamiast być odrzucane, co gwarantuje kompletność raportów finansowych.
+### 1. Wydajność i Modelowanie (dbt)
+* **Eliminacja Fan-out (Galaxy Schema):** Świadoma decyzja o rozdzieleniu danych na 3 tabele faktów (`fact_orders`, `fact_sales_items`, `fact_payments`). Zapobiega to eksplozji kartezjańskiej (powielaniu wierszy) i błędom w agregacji, które wystąpiłyby przy próbie złączenia relacji *One-to-Many-to-Many* w jednej tabeli.
+* **Surrogate Keys & Incremental Logic:** Tabela `stg__order_items` nie posiada natywnego klucza głównego. Rozwiązano to poprzez wygenerowanie deterministycznego klucza zastępczego `MD5(order_id || '-' || item_id)` oraz złączenie z tabelą zamówień w celu wydajnego ładowania przyrostowego.
+* **Ghost Records (Unknown Members):** Obsługa brakujących kluczy obcych (np. w `dim_products`). Błędne relacje są mapowane do sztucznego rekordu `MD5('unknown')`, co zapobiega utracie danych w raportach przy złączeniach `INNER JOIN`.
 
-### 2. Jakość Danych Geograficznych (Data Cleaning)
-Surowe dane logistyczne zawierają wiele błędów (np. koordynaty poza granicami Brazylii) oraz duplikatów (wiele odczytów GPS dla jednego kodu pocztowego).
-* **Walidacja:** Filtrowanie koordynatów w warstwie Staging.
-* **Agregacja:** Wyliczanie centroidu (średnia szerokość/długość) dla każdego `zip_code` w celu stworzenia unikalnego słownika lokalizacji.
+### 2. Architektura i Bezpieczeństwo
+* **Idempotentność Transakcyjna (Savepoints):** Customowy mechanizm w Airflow (`begin_nested()`) usuwa dane z okresu docelowego przed załadowaniem nowych. Gwarantuje to brak duplikatów i bezpieczny rollback w przypadku błędu.
+* **Strategia Fail-Fast:** Pipeline celowo przerywa działanie na starcie, jeśli wykryje brak kluczowych zmiennych środowiskowych (haseł), zapobiegając "cichemu" działaniu na niebezpiecznych ustawieniach.
+* **Symulacja Integralności:** Skrypt ładujący dane emuluje system transakcyjny, zachowując kolejność insertów zgodną z więzami Foreign Keys.
 
-### 3. Obsługa Historii Klientów (Deduplication)
-Klienci w systemie Olist mogą zmieniać adresy.
-* **Logika:** Wymiar `dim_customers` wykorzystuje funkcję okna `ROW_NUMBER() ... ORDER BY order_purchase_timestamp DESC`, aby przypisać do klienta zawsze **aktualny adres** (na podstawie ostatniego zamówienia), tworząc spójny "Golden Record".
+### 3. Jakość i Czyszczenie Danych
+* **Data Repair (Imputacja):** W warstwie Staging zaimplementowano logikę naprawczą – brakujące daty zatwierdzenia zamówienia (`order_approved_at`) są uzupełniane datą zakupu, z jednoczesnym dodaniem flagi audytowej `is_imputed`.
+* **Walidacja Geograficzna (Data Enrichment):** System nie usuwa "sztywno" danych, lecz wzbogaca je o metadane jakościowe. Koordynaty leżące poza obrysem Brazylii otrzymują flagę `is_valid_brazilian_location = False`.
+* **Golden Record (Klienci):** Wymiar `dim_customers` wybiera najbardziej aktualny adres klienta, używając funkcji okna do deduplikacji zmian adresowych w czasie.
 
-### 4. Ciągłość Czasowa (Date Spine)
-Wymiar czasu `dim_date` nie powstał z danych transakcyjnych (co powodowałoby luki w dniach bez sprzedaży), lecz został wygenerowany algorytmicznie za pomocą pakietu `dbt_utils`. Gwarantuje to poprawność analiz typu "Running Total" czy "Year-over-Year".
-
-### 5. Idempotentność Transakcyjna (Airflow Savepoints)
-Pipeline ELT jest w pełni idempotentny — ponowne uruchomienie tego samego DAG-a nie powoduje duplikatów.
-* **Technika:** Zastosowano mechanizm `begin_nested()` (PostgreSQL Savepoints) w PythonOperatorze. Przed załadowaniem partii danych, system usuwa stare rekordy dla danego okresu (DELETE), a w razie błędu transakcja jest bezpiecznie wycofywana, nie naruszając pozostałych danych.
-
-### 6. Strategia Fail-Fast (Security)
-Konfiguracja DAG-ów implementuje podejście **Fail-Fast**.
-* **Bezpieczeństwo:** System celowo przerywa działanie (`raise RuntimeError`) już na poziomie importów, jeśli brakuje krytycznych zmiennych środowiskowych (np. haseł do bazy). Zapobiega to "cichemu" działaniu aplikacji na domyślnych lub niebezpiecznych ustawieniach.
-
-### 7. Symulacja Więzów Integralności (Foreign Keys)
-Skrypt symulujący produkcję (`simulate_production.py`) nie jest prostym ładowaniem CSV.
-* **Logika:** Implementuje graf zależności, ładując dane w ścisłej kolejności (Klienci → Zamówienia → Pozycje/Płatności), co emuluje zachowanie prawdziwego systemu transakcyjnego dbającego o Referencyjną Integralność (Foreign Keys).
-
-### 8. Inteligentna Imputacja Danych (Data Repair)
-W warstwie Staging (`stg__orders`) zaimplementowano logikę naprawczą dla niespójnych danych.
-* **Problem:** Niektóre zamówienia o statusie `delivered` nie posiadały daty zatwierdzenia (`order_approved_at`).
-* **Rozwiązanie:** System automatycznie imputuje brakującą datę (przyjmując datę zakupu) oraz dodaje flagę audytową `is_approval_date_imputed`, co pozwala analitykom odróżnić dane rzeczywiste od naprawionych.
-
-### 9. Optymalizacja Modelu (Outrigger Dimensions)
-Zamiast powielać pełne dane adresowe w wymiarach Klientów i Sprzedawców, zastosowano technikę **Outrigger Dimension**.
-* **Logika:** Wymiar `dim_geolocation` działa jako znormalizowany słownik przypięty do innych wymiarów. Zmniejsza to redundancję danych i pozwala na centralne zarządzanie logiką czyszczenia koordynatów GPS.
+### 4. Konfiguracja i Użyteczność
+* **Code as Configuration (Seeds):** Słowniki (np. statusy zamówień) są zarządzane jako pliki `dbt seeds` (CSV) zamiast być "zaszyte" w kodzie SQL. Umożliwia to analitykom biznesowym aktualizację reguł bez ingerencji w kod inżynierski.
+* **Translation Layer:** Produkty są automatycznie tłumaczone i standaryzowane (PT -> EN) poprzez złączenie z tabelą słownikową, co ułatwia globalne raportowanie bez konieczności skomplikowanych instrukcji `CASE WHEN`. 
 
 ---
 
@@ -148,9 +128,20 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
   <img src="readme_images/dwh.png" alt="Architektura systemu" width="100%">
 </div>
 
+| Tabela Faktów | Opis i Logika |
+| :--- | :--- |
+| **fact_orders** | Centralna tabela transakcyjna. Agreguje wartości koszyka, koszty dostawy oraz łączy statusy zamówień i recenzje w jeden widok analityczny. |
+| **fact_sales_items** | Najbardziej granularna tabela (poziom produktu w koszyku). Pozwala na analizę sprzedaży per Produkt i Sprzedawca. |
+| **fact_payments** | Analiza przepływów pieniężnych, typów płatności (karta, voucher) oraz rat. |
+
+
+### Kluczowe Decyzje Modelowe
+* **Role-Playing Dimensions:** Wymiar `dim_date` łączy się z tabelą `fact_orders` wielokrotnie. Pozwala to na jednoczesną analizę różnych zdarzeń cyklu życia zamówienia (data zakupu, zatwierdzenia, wysyłki, dostawy) przy użyciu jednej fizycznej tabeli kalendarza.
+* **Outrigger Dimension:** Wymiar `dim_geolocation` nie jest podpięty bezpośrednio do tabel faktów, lecz do wymiarów `dim_customer` i `dim_seller`. Taka normalizacja redukuje redundancję danych adresowych i zapewnia spójność geograficzną.
+
 ---
 
-## Struktura Projektu
+## 📂 Struktura Projektu
 
 ```bash
 .
@@ -158,15 +149,16 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
 │   └── olist_elt_dump_dag.py
 ├── olist_dbt/              # Projekt transformacji dbt
 │   ├── models/
-│   │   ├── staging/        # Modele pośrednie (Source & Cleaning)
-│   │   └── marts/          # Modele biznesowe (Galaxy Schema)
-│   ├── seeds/              # Pliki statyczne (CSV)
+│   │   ├── staging/        # Modele pośrednie (Source & Cleaning, Surrogate Keys)
+│   │   └── marts/          # Modele biznesowe (Galaxy Schema, Ghost Records)
+│   ├── seeds/              # Pliki statyczne (CSV - lookup tables)
 │   └── dbt_project.yml
 ├── scripts/                # Skrypty pomocnicze
 │   ├── run_demo.py         # Orkiestrator symulacji
 │   ├── simulate_production.py
-│   └── validate_data.py
+│   └── validate_data.py    # Skrypt QA (Quality Assurance)
 ├── docker-compose.yml      # Definicja infrastruktury
+├── .sqlfluff               # Konfiguracja lintera SQL
 ├── requirements.txt        # Zależności Python
 └── README.md
 ```
