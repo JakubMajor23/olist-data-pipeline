@@ -229,7 +229,7 @@ with DAG(
     # We use 'docker' target in dbt to connect via port 5432 inside the network
     dbt_task = BashOperator(
         task_id='dbt_run',
-        bash_command=f'cd {DBT_PROJECT_DIR} && dbt seed --target docker && dbt run --target docker && dbt test --target docker'
+        bash_command=f'cd {DBT_PROJECT_DIR} && if [ ! -d "dbt_packages" ] || [ -z "$(ls -A dbt_packages)" ]; then dbt deps; fi && dbt seed --target docker && dbt run --target docker && dbt test --target docker'
     )
 
     create_schema_task >> elt_task >> dbt_task

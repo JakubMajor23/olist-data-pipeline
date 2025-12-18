@@ -3,7 +3,6 @@ version: 2
 sources:
   - name: dwh
     description: "Surowe dane Olist ładowane przez Airflow/Docker"
-    database: olist_dwh
     schema: raw_data
     tables:
       - name: olist_products_dataset

@@ -194,8 +194,12 @@ Skrypt `run_demo.py` automatycznie:
 ```bash
 # Przygotowanie środowiska Python
 python -m venv .venv
-# Windows: .venv\Scripts\activate | Linux/Mac: source .venv/bin/activate
+
+# Windows:
+.\.venv\Scripts\activate
+# Linux / macOS:
 source .venv/bin/activate
+
 pip install -r requirements.txt
 
 # Start demo
