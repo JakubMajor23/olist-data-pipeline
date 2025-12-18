@@ -1,0 +1,22 @@
+
+    
+    
+
+with all_values as (
+
+    select
+        is_valid_brazilian_location as value_field,
+        count(*) as n_records
+
+    from "dwh"."raw_data"."stg__geolocation"
+    group by is_valid_brazilian_location
+
+)
+
+select *
+from all_values
+where value_field not in (
+    'True','False'
+)
+
+
