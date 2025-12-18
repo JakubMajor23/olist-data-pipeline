@@ -22,27 +22,27 @@ seeds:
 
 models:
   olist_dbt:
-    # Domyślnie wszystko w projekcie to widok (bezpiecznie)
+    # By default, everything in the project is a view (safe)
     +materialized: view
     
     staging:
-      # 1. Domyślna strategia dla całego folderu 'staging' to TABLE.
-      # Dzięki temu produkty, sprzedawcy, geo będą szybkie, ale zawsze świeże (Full Refresh).
+      # 1. Default strategy for the entire 'staging' folder is TABLE.
+      # This ensures products, sellers, geo will be fast but always fresh (Full Refresh).
       +materialized: table
       +tags: "staging"
 
-      # 2. Wyjątki dla konkretnych modeli (Wielka Czwórka)
-      # Tutaj nadpisujemy ustawienie 'table' na 'incremental'
+      # 2. Exceptions for specific models (Big Four)
+      # Here we override the 'table' setting to 'incremental'
       stg__orders:
         +materialized: incremental
         +unique_key: order_id
       
       stg__order_items:
         +materialized: incremental
-        # Tu uwaga: order_items nie ma jednego ID, kluczem jest para.
-        # W Postgresie dbt incremental bez unique_key działa jako "append-only" (dopisuje).
-        # Jeśli chcesz aktualizacji, musisz zdefiniować klucz złożony (ale to trudniejsze).
-        # Na start 'append' wystarczy, jeśli dane się nie zmieniają wstecznie.
+        # Note: order_items does not have a single ID, the key is a pair.
+        # In Postgres, dbt incremental without unique_key acts as "append-only" (appends).
+        # If you want updates, you must define a composite key (but that's harder).
+        # For now, 'append' is enough if data doesn't change retroactively.
       
       stg__payments:
         +materialized: incremental

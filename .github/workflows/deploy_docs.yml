@@ -58,7 +58,6 @@ jobs:
           EOF
 
       - name: Generate Docs
-        # FLAGA --profiles-dir ~/.dbt JEST KLUCZOWA!
         run: |
           cd olist_dbt
           dbt deps --profiles-dir ~/.dbt

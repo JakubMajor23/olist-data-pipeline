@@ -1,7 +1,7 @@
-# Używamy oficjalnego obrazu Airflow jako bazy
+# Use the official Airflow image as a base
 FROM apache/airflow:2.10.2
 
-# Przełączamy się na roota, żeby zainstalować systemowe dodatki (opcjonalne, ale git przydaje się do dbt)
+# Switch to root to install system dependencies (optional, but git is useful for dbt)
 USER root
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -10,11 +10,11 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Wracamy na użytkownika airflow, żeby instalować pakiety Pythona
+# Switch back to the airflow user to install Python packages
 USER airflow
 
-# Kopiujemy nasz plik z wymaganiami do kontenera
+# Copy our requirements file to the container
 COPY requirements.txt /requirements.txt
 
-# Instalujemy biblioteki
+# Install libraries
 RUN pip install --no-cache-dir -r /requirements.txt

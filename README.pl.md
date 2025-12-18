@@ -18,7 +18,7 @@
 
 <h3>
   <a href="https://jakubmajor23.github.io/olist-data-pipeline/">
-    🚀 Live Demo: Pełna Dokumentacja i Data Lineage (dbt Docs)
+    Live Demo: Pełna Dokumentacja i Data Lineage (dbt Docs)
   </a>
 </h3>
 
@@ -36,15 +36,15 @@
 
 ---
 
-## 💡 Kontekst i Cele
+## Kontekst i Cele
 
 **Problem:** Surowe dane Olist to rozproszone logi transakcyjne – analiza przychodu, opóźnień czy retencji wymaga łączenia wielu tabel i jest nieefektywna w czasie rzeczywistym.
 
 **Rozwiązanie:** Zautomatyzowany potok danych przekształcający surowe logi w czysty model **Galaxy Schema** (Konstelacja Faktów) w Hurtowni Danych.
 
-### 📚 Dokumentacja Projektu (Live)
+### Dokumentacja Projektu (Live)
 Projekt posiada w pełni wygenerowaną dokumentację dbt, dostępną online:
-👉 **[Kliknij tutaj, aby zobaczyć Data Lineage i Słownik Danych](https://jakubmajor23.github.io/olist-data-pipeline/)**
+**[Kliknij tutaj, aby zobaczyć Data Lineage i Słownik Danych](https://jakubmajor23.github.io/olist-data-pipeline/)**
 
 ### Główne Cele
 - **Single Source of Truth:** Centralizacja danych o Zamówieniach, Płatnościach i Produktach.
@@ -53,7 +53,7 @@ Projekt posiada w pełni wygenerowaną dokumentację dbt, dostępną online:
 
 ---
 
-## 🛠 Zastosowane Wzorce i Technologie
+## Zastosowane Wzorce i Technologie
 
 Projekt realizuje zasady inżynierii danych (**Modern Data Stack**) poprzez:
 
@@ -68,7 +68,7 @@ Projekt realizuje zasady inżynierii danych (**Modern Data Stack**) poprzez:
 
 ---
 
-## 🏗 Architektura i Przepływ Danych
+## Architektura i Przepływ Danych
 
 System zaprojektowano modułowo, oddzielając warstwę symulacji od właściwego przetwarzania.
 
@@ -94,7 +94,7 @@ Proces symuluje rzeczywiste działanie hurtowni danych w trybie przyrostowym (In
 
 ---
 
-## 🛠️ Szczegóły Transformacji (dbt)
+## Szczegóły Transformacji (dbt)
 
 Warstwa transformacji została podzielona na dwa etapy zgodnie z dobrymi praktykami Analytics Engineering:
 
@@ -113,7 +113,7 @@ Model **Galaxy Schema** łączy procesy biznesowe przez wspólne wymiary (*Confo
 
 ---
 
-## 🌟 Ważne Rozwiązania Techniczne
+## Ważne Rozwiązania Techniczne
 
 Projekt implementuje zaawansowane wzorce inżynierii danych, wykraczające poza standardowe kursy ETL.
 
@@ -142,7 +142,7 @@ Projekt implementuje zaawansowane wzorce inżynierii danych, wykraczające poza 
 
 ---
 
-## 📊 Model Danych
+## Model Danych
 
 ### Model Galaxy Schema
 Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele faktów współdzielą wymiary (*conformed dimensions*).
@@ -157,7 +157,7 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
 
 ---
 
-## 📂 Struktura Projektu
+## Struktura Projektu
 
 ```bash
 .
@@ -179,7 +179,7 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
 └── README.md
 ```
 
-## 🚀 Instrukcja Uruchomienia
+## Instrukcja Uruchomienia
 
 ### Wymagania
 * Docker & Docker Compose

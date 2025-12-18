@@ -28,15 +28,15 @@
 
 ---
 
-## 💡 Context & Goals
+## Context & Goals
 
 **Problem:** Raw Olist data consists of scattered transaction logs. Analyzing revenue, delivery delays, or customer retention requires joining multiple tables, which is inefficient for real-time reporting.
 
 **Solution:** An automated data pipeline that transforms raw logs into a clean **Galaxy Schema** (Fact Constellation) within the Data Warehouse.
 
-### 📚 Project Documentation (Live)
+### Project Documentation (Live)
 The project includes fully generated dbt documentation available online:
-👉 **[Click here to view Data Lineage and Data Dictionary](https://jakubmajor23.github.io/olist-data-pipeline/)**
+**[Click here to view Data Lineage and Data Dictionary](https://jakubmajor23.github.io/olist-data-pipeline/)**
 
 ### Main Objectives
 - **Single Source of Truth:** Centralized data for Orders, Payments, and Products.
@@ -45,7 +45,7 @@ The project includes fully generated dbt documentation available online:
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 The project adheres to **Modern Data Stack** principles:
 
@@ -60,7 +60,7 @@ The project adheres to **Modern Data Stack** principles:
 
 ---
 
-## 🏗 Architecture & Data Flow
+## Architecture & Data Flow
 
 The system is designed with modularity in mind, separating the simulation layer from the actual processing pipeline.
 
@@ -86,7 +86,7 @@ The process simulates a real-world Data Warehouse operation in incremental mode:
 
 ---
 
-## 🛠️ Transformation Details (dbt)
+## Transformation Details (dbt)
 
 The transformation layer is divided into two stages following Analytics Engineering best practices:
 
@@ -105,7 +105,7 @@ The **Galaxy Schema** model connects business processes via *Conformed Dimension
 
 ---
 
-## 🌟 Key Technical Solutions
+## Key Technical Solutions
 
 This project implements advanced Data Engineering patterns beyond standard ETL tutorials.
 
@@ -134,7 +134,7 @@ This project implements advanced Data Engineering patterns beyond standard ETL t
 
 ---
 
-## 📊 Data Model
+## Data Model
 
 ### Galaxy Schema
 The project utilizes a **Fact Constellation** architecture where three fact tables share **Conformed Dimensions**.
@@ -155,7 +155,7 @@ The project utilizes a **Fact Constellation** architecture where three fact tabl
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 .
@@ -175,9 +175,9 @@ The project utilizes a **Fact Constellation** architecture where three fact tabl
 ├── .sqlfluff               # SQL Linter config
 ├── requirements.txt        # Python dependencies
 └── README.md
+```
 
-
-## 🚀 Setup & Usage
+## Setup & Usage
 
 ### Prerequisites
 * Docker & Docker Compose
