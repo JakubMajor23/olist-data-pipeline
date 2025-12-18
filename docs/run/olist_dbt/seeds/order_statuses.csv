@@ -1,0 +1,12 @@
+
+    
+    
+    truncate table "dwh"."dwh_main_prod"."order_statuses";
+    -- dbt seed --
+    
+          insert into "dwh"."dwh_main_prod"."order_statuses" ("order_status", "is_final_status") values
+          (%s,%s),(%s,%s),(%s,%s),(%s,%s),(%s,%s),(%s,%s),(%s,%s),(%s,%s)
+      
+
+;
+  

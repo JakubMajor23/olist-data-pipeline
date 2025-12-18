@@ -1,0 +1,12 @@
+
+    
+    
+    truncate table "dwh"."dwh_main_prod"."payments_types";
+    -- dbt seed --
+    
+          insert into "dwh"."dwh_main_prod"."payments_types" ("payment_type") values
+          (%s),(%s),(%s),(%s),(%s)
+      
+
+;
+  
