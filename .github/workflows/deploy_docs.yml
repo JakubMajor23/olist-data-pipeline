@@ -1,0 +1,70 @@
+name: Deploy dbt Docs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: dwh
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dbt
+        run: pip install dbt-postgres
+
+      - name: Configure dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
+          olist_project:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: localhost
+                user: user
+                password: password
+                port: 5432
+                dbname: dwh
+                schema: raw_data
+                threads: 1
+          EOF
+
+      - name: Generate Docs
+        run: |
+          cd olist_dbt
+          dbt deps
+          dbt docs generate
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: olist_dbt/target
+          branch: gh-pages

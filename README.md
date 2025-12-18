@@ -180,6 +180,9 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
 **1. Konfiguracja Środowiska**
 Skopiuj przykładowy plik konfiguracyjny (zawiera domyślne hasła dla środowiska deweloperskiego).
 ```bash
+# Windows:
+copy .env.example .env
+#Linux / MacOS:
 cp .env.example .env
 ```
 
@@ -201,7 +204,7 @@ python -m venv .venv
 
 # Windows:
 .\.venv\Scripts\activate
-# Linux / macOS:
+# Linux / MacOS:
 source .venv/bin/activate
 
 pip install -r requirements.txt
