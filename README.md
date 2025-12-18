@@ -212,7 +212,7 @@ python scripts/run_demo.py
 - [x] **Orkiestracja**: Architektura Event-driven poprzez Airflow API.
 - [x] **QA**: Automatyczna weryfikacja danych (`validate_data.py`).
 - [ ] **Dokumentacja**: Hosting `dbt docs`.
-- [ ] **BI**: Dashboardy w Metabase/Superset.
+- [ ] **BI**: Dashboardy Power BI.
 
 <br>
 
