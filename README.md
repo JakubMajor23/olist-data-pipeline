@@ -28,6 +28,10 @@
 
 **Rozwiązanie:** Zautomatyzowany potok danych przekształcający surowe logi w czysty model **Galaxy Schema** (Konstelacja Faktów) w Hurtowni Danych.
 
+### 📚 Dokumentacja Projektu (Live)
+Projekt posiada w pełni wygenerowaną dokumentację dbt, dostępną online:
+👉 **[Kliknij tutaj, aby zobaczyć Data Lineage i Słownik Danych](https://jakubmajor23.github.io/olist-data-pipeline/)**
+
 ### Główne Cele
 - **Single Source of Truth:** Centralizacja danych o Zamówieniach, Płatnościach i Produktach.
 - **Skalowalność:** Ładowanie przyrostowe (Incremental Loading) dla obsługi rosnącego wolumenu danych.
@@ -215,7 +219,7 @@ python scripts/run_demo.py
 - [x] **Transformacja**: Modele dbt Incremental & implementacja Galaxy Schema.
 - [x] **Orkiestracja**: Architektura Event-driven poprzez Airflow API.
 - [x] **QA**: Automatyczna weryfikacja danych (`validate_data.py`).
-- [ ] **Dokumentacja**: Hosting `dbt docs`.
+- [x] **Dokumentacja**: Hosting `dbt docs`.
 - [ ] **BI**: Dashboardy Power BI.
 
 <br>
