@@ -58,10 +58,11 @@ jobs:
           EOF
 
       - name: Generate Docs
+        # FLAGA --profiles-dir ~/.dbt JEST KLUCZOWA!
         run: |
           cd olist_dbt
-          dbt deps
-          dbt docs generate
+          dbt deps --profiles-dir ~/.dbt
+          dbt docs generate --profiles-dir ~/.dbt
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4

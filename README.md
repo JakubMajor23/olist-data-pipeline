@@ -121,6 +121,10 @@ Projekt implementuje zaawansowane wzorce inżynierii danych, wykraczające poza 
 * **Code as Configuration (Seeds):** Słowniki (np. statusy zamówień) są zarządzane jako pliki `dbt seeds` (CSV) zamiast być "zaszyte" w kodzie SQL. Umożliwia to analitykom biznesowym aktualizację reguł bez ingerencji w kod inżynierski.
 * **Translation Layer:** Produkty są automatycznie tłumaczone i standaryzowane (PT -> EN) poprzez złączenie z tabelą słownikową, co ułatwia globalne raportowanie bez konieczności skomplikowanych instrukcji `CASE WHEN`. 
 
+### 5. Automatyzacja (CI/CD)
+* **Automated Linting (CI):** Każdy Pull Request jest weryfikowany przez **GitHub Actions**, który uruchamia `sqlfluff`. Blokuje to zmergowanie kodu niespełniającego standardów stylistycznych, wymuszając wysoką jakość kodu w zespole.
+* **Documentation Deployment (CD):** Proces wdrażania dokumentacji jest w pełni zautomatyzowany. Po zatwierdzeniu zmian na branchu `main`, GitHub Actions stawia **tymczasową bazę danych (Service Container)**, kompiluje projekt dbt i publikuje zaktualizowaną stronę na GitHub Pages.
+
 ---
 
 ## Model Danych
