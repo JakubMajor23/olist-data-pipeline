@@ -177,7 +177,7 @@ Projekt wykorzystuje architekturę **Konstelacji Faktów**, gdzie trzy tabele fa
 ├── .sqlfluff               # Konfiguracja lintera SQL
 ├── requirements.txt        # Zależności Python
 └── README.md
-
+```
 
 ## 🚀 Instrukcja Uruchomienia
 
