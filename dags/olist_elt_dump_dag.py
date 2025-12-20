@@ -213,7 +213,8 @@ with DAG(
         max_active_runs=1,  # Limit to 1 to prevent DB overload during backfill
         schedule_interval=None,  # Triggered externally (API Trigger)
         catchup=False,
-        tags=['olist', 'elt']
+        tags=['olist', 'elt'],
+        is_paused_upon_creation=False
 ) as dag:
     create_schema_task = PythonOperator(
         task_id='create_raw_schema',
