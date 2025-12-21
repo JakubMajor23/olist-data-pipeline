@@ -22,26 +22,14 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_order_status')
               field: order_status_key
-
-      - name: review_key
-        description: "Key to the order review content."
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-              to: ref('dim_reviews')
-              field: review_key
-
       
       - name: order_purchase_timestamp_key
         description: "Order purchase date."
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_date')
               field: data_key
 
@@ -50,7 +38,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_date')
               field: data_key
 
@@ -59,7 +46,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_date')
               field: data_key
 
@@ -68,25 +54,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
-              to: ref('dim_date')
-              field: data_key
-
-      - name: review_creation_date_key
-        description: "Review creation date (survey)."
-        tests:
-          - not_null
-          - relationships:
-              arguments:
-              to: ref('dim_date')
-              field: data_key
-
-      - name: review_answer_date_key
-        description: "Survey answer date."
-        tests:
-          - not_null
-          - relationships:
-              arguments:
               to: ref('dim_date')
               field: data_key
 
@@ -111,11 +78,3 @@ models:
           - not_null
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
-  
-      - name: review_score
-        description: "Numerical order rating (e.g., 1-5)."
-        tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
-              max_value: 5  

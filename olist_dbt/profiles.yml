@@ -22,4 +22,4 @@ olist_project:
       password: "{{ env_var('POSTGRES_PASSWORD', 'olist') }}" 
       dbname: "{{ env_var('POSTGRES_DB', 'olist_dwh') }}"
 
-      schema: dwh_main_prod
+      schema: main

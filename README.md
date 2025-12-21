@@ -102,6 +102,7 @@ The **Galaxy Schema** model connects business processes via *Conformed Dimension
 | **fact_orders** | Central transactional table. Aggregates cart values (`SUM(price)`), freight costs, and combines order statuses with reviews. |
 | **fact_sales_items** | Granular table (Product-in-Cart level). Enables sales analysis by Product (`product_id`) and Seller (`seller_id`). |
 | **fact_payments** | Analysis of cash flows, payment types (credit card, voucher), and installments (`payment_installments`). |
+| **fact_reviews** | Dedicated fact table for handling review text and scores, resolving data loss issues (recovering 100k+ reviews vs 3k). |
 
 ---
 
@@ -124,11 +125,17 @@ This project implements advanced Data Engineering patterns beyond standard ETL t
 * **Geo Validation (Data Enrichment):** Instead of hard deletion, data is enriched with quality metadata. Coordinates falling outside Brazil's boundaries receive `is_valid_brazilian_location = False`.
 * **Golden Record (Customers):** `dim_customers` uses window functions to deduplicate address changes, selecting the most recent location data.
 
-### 4. Configuration & Usability
+### 4. Data Quality & Findings
+* **Review Data Recovery:** Addressed a critical data loss issue where only ~3,110 reviews were initially captured. By decoupling reviews into `fact_reviews`, the system now correctly handles over 100k review records from the source CSV.
+* **Geolocation Aggregation:** The raw dataset contains ~1 million geolocation records. These are aggressively aggregated to ~19k unique `zip_code_prefix` entries in `dim_geolocation` to serve as a lookup table, with 100% prefix coverage.
+* **Customer Deduplication:** Removed ~3,345 duplicate customer records to ensure `customer_unique_id` integrity.
+* **Staging Cleaning:** One product record is intentionally dropped during `stg_products` processing due to missing or invalid critical fields.
+
+### 5. Configuration & Usability
 * **Code as Configuration (Seeds):** Mapping dictionaries (e.g., order statuses) are managed as `dbt seeds` (CSV) rather than hardcoded `CASE WHEN` statements in SQL. This allows business analysts to update rules without modifying engineering code.
 * **Translation Layer:** Automatic standardization of product categories (PT -> EN) via dictionary joins, adhering to DRY principles and simplifying global reporting.
 
-### 5. Automation (CI/CD)
+### 6. Automation (CI/CD)
 * **Automated Linting (CI):** Every Pull Request is verified by **GitHub Actions** running `sqlfluff`. This blocks non-compliant code from being merged.
 * **Documentation Deployment (CD):** The documentation deployment process is fully automated. Upon merging to `main`, GitHub Actions spins up a **temporary database service**, compiles the dbt project, and publishes the updated site to GitHub Pages.
 
@@ -148,6 +155,7 @@ The project utilizes a **Fact Constellation** architecture where three fact tabl
 | **fact_orders** | Central transactional table. Aggregates cart values, freight costs, and combines statuses with reviews. |
 | **fact_sales_items** | Granular table. Enables sales analysis by Product and Seller. |
 | **fact_payments** | Analysis of cash flows, payment types, and installments. |
+| **fact_reviews** | Dedicated fact table for reviews and scores. |
 
 ### Key Modeling Decisions
 * **Role-Playing Dimensions:** `dim_date` connects to `fact_orders` multiple times. This allows simultaneous analysis of different lifecycle events (Purchase Date, Approved Date, Delivered Date) using a single physical calendar table.

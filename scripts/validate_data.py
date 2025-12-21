@@ -40,7 +40,7 @@ DB_CONNECTION_STR = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_N
 # Must match the logic used in 'simulate_production.py'
 FILES_TO_TABLES = {
     'olist_customers_dataset.csv': 'olist_customers_dataset',
-    'olist_geolocation_dataset.csv': 'olist_geo_dataset',  # Note: 'geo' shortened in simulation script
+    'olist_geolocation_dataset.csv': 'olist_geolocation_dataset',  # Note: 'geo' shortened in simulation script
     'olist_orders_dataset.csv': 'olist_orders_dataset',
     'olist_order_items_dataset.csv': 'olist_order_items_dataset',
     'olist_order_payments_dataset.csv': 'olist_order_payments_dataset',

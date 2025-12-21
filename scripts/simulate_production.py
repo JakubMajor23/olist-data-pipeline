@@ -45,7 +45,7 @@ FILES = {
     'customers': 'olist_customers_dataset.csv',
     'products': 'olist_products_dataset.csv',
     'sellers': 'olist_sellers_dataset.csv',
-    'geo': 'olist_geolocation_dataset.csv'
+    'geolocation': 'olist_geolocation_dataset.csv'
 }
 
 
@@ -64,7 +64,7 @@ def load_static_data():
     engine = get_engine()
     logger.info("--- Starting Static Data Load (Reference Data) ---")
 
-    static_tables = ['products', 'sellers', 'geo']
+    static_tables = ['products', 'sellers', 'geolocation']
 
     for key in static_tables:
         logger.info(f"Processing: {key}...")
@@ -81,7 +81,7 @@ def load_static_data():
             # if_exists='append': We don't drop tables (to preserve Foreign Keys), just append.
             # Ideally, this should use 'replace' only if tables are empty or constraints allow.
             table_name = f'olist_{key}_dataset'
-            df.to_sql(table_name, engine, schema='public', if_exists='append', index=False)
+            df.to_sql(table_name, engine, schema='public', if_exists='append', index=False, chunksize=1000)
 
             logger.info(f" -> [OK] {table_name}: Loaded {rows_in_csv} rows.")
         except Exception as e:

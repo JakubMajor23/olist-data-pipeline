@@ -110,6 +110,7 @@ Model **Galaxy Schema** łączy procesy biznesowe przez wspólne wymiary (*Confo
 | **fact_orders** | Centralna tabela transakcyjna. Agreguje wartości koszyka (`SUM(price)`), koszty dostawy oraz łączy statusy zamówień i recenzje w jeden widok analityczny. |
 | **fact_sales_items** | Najbardziej granularna tabela (poziom produktu w koszyku). Pozwala na analizę sprzedaży per Produkt (`product_id`) i Sprzedawca (`seller_id`). |
 | **fact_payments** | Analiza przepływów pieniężnych, typów płatności (karta, voucher) oraz rat (`payment_installments`). |
+| **fact_reviews** | Dedykowana tabela faktów dla recenzji i ocen. Rozwiązuje problem utraty danych (odzyskano 100 tys.+ recenzji vs 3 tys.). |
 
 ---
 
@@ -132,11 +133,17 @@ Projekt implementuje zaawansowane wzorce inżynierii danych, wykraczające poza 
 * **Walidacja Geograficzna (Data Enrichment):** System nie usuwa "sztywno" danych, lecz wzbogaca je o metadane jakościowe. Koordynaty leżące poza obrysem Brazylii otrzymują flagę `is_valid_brazilian_location = False`.
 * **Golden Record (Klienci):** Wymiar `dim_customers` wybiera najbardziej aktualny adres klienta, używając funkcji okna do deduplikacji zmian adresowych w czasie.
 
-### 4. Konfiguracja i Utrzymanie (Maintainability)
+### 4. Jakość Danych i Spójność
+* **Naprawa Danych Recenzji:** Rozwiązano krytyczny problem utraty danych, gdzie początkowo system rejestrował tylko ~3 110 recenzji. Dzięki wydzieleniu `fact_reviews`, pipeline poprawnie przetwarza teraz ponad 100 tys. rekordów ze źródłowego pliku CSV.
+* **Agregacja Geolokalizacji:** Surowy zbiór danych zawiera ~1 milion rekordów geolokalizacyjnych. Zostały one zagregowane do ~19 tys. unikalnych prefiksów kodów pocztowych (`zip_code_prefix`) w `dim_geolocation`, zachowując 100% pokrycia prefiksów.
+* **Deduplikacja Klientów:** Usunięto rónicę 3 345 duplikatów rekordów klientów, aby zapewnić integralność `customer_unique_id`.
+* **Czyszczenie Danych (Staging):** Jeden produkt jest celowo odrzucany podczas przetwarzania `stg_products` z powodu niespójności danych.
+
+### 5. Konfiguracja i Utrzymanie (Maintainability)
 * **Separation of Concerns (Seeds):** Słowniki mapujące (np. statusy zamówień) są wydzielone do plików `dbt seeds` (CSV) zamiast być "zaszyte" (hardcoded) w instrukcjach `CASE WHEN`. Dzięki temu zmiana reguł biznesowych wymaga jedynie edycji pliku konfiguracyjnego, bez konieczności modyfikowania kodu SQL transformacji.
 * **Translation Layer:** Produkty są automatycznie tłumaczone i standaryzowane (PT -> EN) poprzez złączenie z tabelą słownikową, co ułatwia globalne raportowanie bez konieczności skomplikowanych instrukcji warunkowych.
 
-### 5. Automatyzacja (CI/CD)
+### 6. Automatyzacja (CI/CD)
 * **Automated Linting (CI):** Każdy Pull Request jest weryfikowany przez **GitHub Actions**, który uruchamia `sqlfluff`. Blokuje to zmergowanie kodu niespełniającego standardów stylistycznych, wymuszając wysoką jakość kodu w zespole.
 * **Documentation Deployment (CD):** Proces wdrażania dokumentacji jest w pełni zautomatyzowany. Po zatwierdzeniu zmian na branchu `main`, GitHub Actions stawia **tymczasową bazę danych (Service Container)**, kompiluje projekt dbt i publikuje zaktualizowaną stronę na GitHub Pages.
 

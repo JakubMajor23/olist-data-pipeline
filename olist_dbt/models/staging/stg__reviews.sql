@@ -1,12 +1,6 @@
 WITH source AS (
     SELECT *
     FROM {{ source('dwh', 'olist_order_reviews_dataset') }}
-
-    {% if is_incremental() %}
-        WHERE
-            CAST(review_creation_date AS DATE)
-            > (SELECT MAX(review_creation_date) FROM {{ this }})
-    {% endif %}
 ),
 
 transformed AS (
@@ -28,10 +22,9 @@ deduplicated AS (
         *,
         ROW_NUMBER() OVER (
             PARTITION BY review_id
-            ORDER BY order_id
+            ORDER BY review_answer_timestamp DESC
         ) AS rn
-    FROM
-        transformed
+    FROM transformed
 )
 
 SELECT
@@ -42,7 +35,5 @@ SELECT
     review_comment_message,
     review_creation_date,
     review_answer_timestamp
-FROM
-    deduplicated
-WHERE
-    rn = 1
+FROM deduplicated
+WHERE rn = 1

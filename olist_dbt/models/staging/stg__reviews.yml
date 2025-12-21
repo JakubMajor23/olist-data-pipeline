@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg__reviews
-    description: "Staging model for customer reviews, standardizing data types and handling missing comment/title values."
+    description: "Staging model for reviews. Loads all available data from source."
 
     columns:
       - name: review_id
