@@ -1,10 +1,10 @@
 SELECT
     p.product_id,
 
-    p.product_weight_g,
-    p.product_length_cm,
-    p.product_height_cm,
-    p.product_width_cm,
+    COALESCE(p.product_weight_g, 0) AS product_weight_g,
+    COALESCE(p.product_length_cm, 0) AS product_length_cm,
+    COALESCE(p.product_height_cm, 0) AS product_height_cm,
+    COALESCE(p.product_width_cm, 0) AS product_width_cm,
 
     COALESCE(t.product_category_name_english, 'unknown')
         AS product_category_name_english,

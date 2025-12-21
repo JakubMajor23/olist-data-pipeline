@@ -11,12 +11,12 @@
         
     
   
-( 1=1 and review_score >= 0 and review_score <= 5
+( 1=1 and review_score >= 1 and review_score <= 5
 )
  as expression
 
 
-    from "dwh"."raw_data"."fact_orders"
+    from "dwh"."raw_data"."fact_reviews"
     
 
 ),

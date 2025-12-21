@@ -1,8 +1,6 @@
 WITH source AS (
     SELECT *
     FROM "dwh"."raw_data"."olist_order_reviews_dataset"
-
-    
 ),
 
 transformed AS (
@@ -24,10 +22,9 @@ deduplicated AS (
         *,
         ROW_NUMBER() OVER (
             PARTITION BY review_id
-            ORDER BY order_id
+            ORDER BY review_answer_timestamp DESC
         ) AS rn
-    FROM
-        transformed
+    FROM transformed
 )
 
 SELECT
@@ -38,7 +35,5 @@ SELECT
     review_comment_message,
     review_creation_date,
     review_answer_timestamp
-FROM
-    deduplicated
-WHERE
-    rn = 1
+FROM deduplicated
+WHERE rn = 1
