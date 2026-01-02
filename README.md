@@ -13,7 +13,7 @@
 ![Docker](https://img.shields.io/badge/Docker--Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![SQLFluff](https://img.shields.io/badge/SQLFluff-Expected_Quality-00C7B7?style=for-the-badge&logo=sql&logoColor=white)
 ![CI Status](https://github.com/jakubmajor23/olist-data-pipeline/actions/workflows/ci_checks.yml/badge.svg)
-
+![Power Bi](https://img.shields.io/badge/power_bi-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 <br>
 
 **Complete, scalable ELT (Extract, Load, Transform) system simulating a production e-commerce environment.**
@@ -231,6 +231,40 @@ pip install -r requirements.txt
 python scripts/run_demo.py
 ```
 
+## Analytics and Reporting (Power BI)
+
+The presentation layer of the project was built using **Microsoft Power BI**. Data processed by dbt is visualized in the form of an interactive report, allowing for the analysis of e-commerce performance across three key dimensions.
+
+### 1. Executive Summary & Sales Overview
+The main managerial dashboard presenting the financial health of the business.
+
+* **KPI Overview:** Monitoring of key metrics: GMV, AOV, Order Count, and logistics indicators (Freight Ratio, Delivery Success Rate).
+* **Trend Analysis (Time Series):** Visualization of monthly sales (GMV) demonstrating seasonality and a general upward trend over a 2-year period.
+* **Pareto Analysis (80/20 Rule):** A combo chart identifying key sellers who generate the majority of total revenue.
+* **Payment Method Analysis:** Examination of the impact of payment type on Average Order Value (AOV), highlighting the dominance of *credit card installments*.
+
+![Sales Dashboard](readme_images/D1.png)
+
+### 2. Geographic Analysis & Logistics
+Visualization of customer distribution and supply chain efficiency across Brazil.
+
+* **Performance Indicators (KPIs):** Monitoring of on-time performance, average delays, and median *Lead Time*.
+* **Operational Funnel:** Visualization of order statuses in the pipeline to identify bottlenecks and monitor cancellation rates.
+* **Geospatial Analysis:** An *Average Delays by Region* map utilizing geolocation data to pinpoint logistically problematic areas.
+* **Correlation Study:** A *Scatter Plot* examining the relationship between delivery time and customer rating, confirming the hypothesis of a negative correlation between delays and *Review Score*.
+
+![Geo Dashboard](readme_images/D2.png)
+
+### 3. Product & Customer Satisfaction (CRM)
+Advanced analysis of customer behavior and retention.
+
+* **RFM Segmentation (Recency, Frequency, Monetary):** Segmentation of the customer base (e.g., "Champions", "Lost", "Promising") for personalized communication strategies. The visualization highlights the dominance of the "Lost" segment.
+* **Cohort Analysis:** A retention matrix (*heatmap*) tracking customer return rates in subsequent months from the first purchase, revealing low long-term retention (<1% after month 1).
+* **Customer Value Comparison (AOV):** A comparison of one-time vs. returning customer basket value, proving the financial value of building loyalty.
+* **Loyalty Matrix:** A *Recency vs Frequency* heatmap allowing for a quick assessment of the customer base structure.
+
+![Product Dashboard](readme_images/D3.png)
+
 ### Roadmap & Status
 
 - [x] Infrastructure: Dockerized Airflow & Postgres.
@@ -240,7 +274,7 @@ python scripts/run_demo.py
 - [x] QA: Automatic data validation (validate_data.py).
 - [x] Documentation: Hosted dbt docs on GitHub Pages.
 - [x] CI/CD: GitHub Actions pipelines.
-- [ ] BI: Power BI Dashboards.
+- [x] BI: Power BI Dashboards.
 
 <div align="center">
 

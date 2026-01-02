@@ -13,7 +13,7 @@
 ![Docker](https://img.shields.io/badge/Docker--Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![SQLFluff](https://img.shields.io/badge/SQLFluff-Expected_Quality-00C7B7?style=for-the-badge&logo=sql&logoColor=white)
 ![CI Status](https://github.com/jakubmajor23/olist-data-pipeline/actions/workflows/ci_checks.yml/badge.svg)
-
+![Power Bi](https://img.shields.io/badge/power_bi-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 <br>
 
 <h3>
@@ -231,6 +231,40 @@ pip install -r requirements.txt
 # Start demo
 python scripts/run_demo.py
 ```
+## Analityka i Raportowanie (Power BI)
+
+Warstwa prezentacyjna projektu została zrealizowana w **Microsoft Power BI**. Dane przetworzone przez dbt są wizualizowane w formie interaktywnego raportu, który pozwala na analizę kondycji e-commerce w trzech kluczowych wymiarach.
+
+### 1. Ogólny Przegląd Sprzedaży (Executive Summary)
+Główny pulpit menedżerski prezentujący kondycję biznesu w ujęciu finansowym.
+
+* **KPI Overview:** Monitorowanie kluczowych metryk: GMV, AOV, liczby zamówień oraz wskaźników logistycznych (Freight Ratio, Delivery Success Rate).
+* **Analiza Trendów (Time Series):** Wizualizacja miesięcznej sprzedaży (GMV) wykazująca sezonowość i ogólny trend wzrostowy na przestrzeni 2 lat.
+* **Analiza Pareto (Zasada 80/20):** Wykres combo identyfikujący kluczowych sprzedawców, którzy generują największą część przychodu.
+* **Analiza Metod Płatności:** Badanie wpływu typu płatności na średnią wartość koszyka (AOV), z wyraźnym wskazaniem na przewagę płatności ratalnych (*credit card installments*).
+
+![Sales Dashboard](readme_images/D1.png)
+
+### 2. Analiza Geograficzna i Logistyka
+Wizualizacja rozmieszczenia klientów oraz efektywności łańcucha dostaw na terenie Brazylii.
+
+* **Wskaźniki Wydajności (KPIs):** Monitorowanie terminowości, średniego opóźnienia oraz mediany czasu dostawy (*Lead Time*).
+* **Analiza Lejka Operacyjnego (Funnel):** Wizualizacja statusów zamówień w toku, pozwalająca zidentyfikować "wąskie gardła" oraz monitorować współczynnik anulowań.
+* **Analiza Geoprzestrzenna:** Mapa opóźnień (*Average Delays by Region*) wykorzystująca dane geograficzne do identyfikacji regionów problematycznych logistycznie.
+* **Badanie Korelacji:** Wykres punktowy (*Scatter Plot*) badający zależność między czasem dostawy a oceną klienta, potwierdzający hipotezę o negatywnym wpływie opóźnień na *Review Score*.
+
+![Geo Dashboard](readme_images/D2.png)
+
+### 3. Produkty i Zadowolenie Klientów (CRM)
+Zaawansowana analityka zachowań klientów i retencji.
+
+* **Segmentacja RFM (Recency, Frequency, Monetary):** Podział bazy klientów na segmenty (m.in. "Champions", "Lost", "Promising") w celu personalizacji komunikacji. Wizualizacja uwypukla dominację segmentu "Lost".
+* **Analiza Kohortowa (Cohort Analysis):** Macierz retencji (*heatmapa*) śledząca powracalność klientów w kolejnych miesiącach od pierwszego zakupu, ujawniająca niską retencję długoterminową (<1% po 1. miesiącu).
+* **Porównanie Wartości Klienta (AOV):** Zestawienie średniej wartości koszyka klienta jednorazowego z powracającym, udowadniające wartość budowania lojalności.
+* **Macierz Lojalności:** Heatmapa *Recency vs Frequency* pozwalająca na szybką ocenę struktury bazy klienckiej.
+
+![Product Dashboard](readme_images/D3.png)
+
 
 ### Roadmapa i Status
 
@@ -241,7 +275,7 @@ python scripts/run_demo.py
 - [x] QA: Automatyczna weryfikacja danych (validate_data.py).
 - [x] Dokumentacja: Hosting dbt docs na GitHub Pages.
 - [x] Automatyzacja (CI/CD): GitHub Actions pipelines.
-- [ ] BI: Dashboardy Power BI.
+- [x] BI: Dashboardy Power BI.
 
 <div align="center">
 
