@@ -256,7 +256,7 @@ Visualization of customer distribution and supply chain efficiency across Brazil
 ![Geo Dashboard](readme_images/D2.png)
 
 ### 3. Customer Satisfaction
-Advanced analysis of customer behavior and retention.
+Analysis of customer behavior and retention.
 
 * **RFM Segmentation (Recency, Frequency, Monetary):** Segmentation of the customer base (e.g., "Champions", "Lost", "Promising") for personalized communication strategies. The visualization highlights the dominance of the "Lost" segment.
 * **Cohort Analysis:** A retention matrix (*heatmap*) tracking customer return rates in subsequent months from the first purchase, revealing low long-term retention (<1% after month 1).
