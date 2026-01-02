@@ -256,7 +256,7 @@ Wizualizacja rozmieszczenia klientów oraz efektywności łańcucha dostaw na te
 ![Geo Dashboard](readme_images/D2.png)
 
 ### 3. Zadowolenie Klientów
-Zaawansowana analityka zachowań klientów i retencji.
+Analityka zachowań klientów i retencji.
 
 * **Segmentacja RFM (Recency, Frequency, Monetary):** Podział bazy klientów na segmenty (m.in. "Champions", "Lost", "Promising") w celu personalizacji komunikacji. Wizualizacja uwypukla dominację segmentu "Lost".
 * **Analiza Kohortowa (Cohort Analysis):** Macierz retencji (*heatmapa*) śledząca powracalność klientów w kolejnych miesiącach od pierwszego zakupu, ujawniająca niską retencję długoterminową (<1% po 1. miesiącu).
