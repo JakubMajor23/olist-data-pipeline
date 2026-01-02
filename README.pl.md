@@ -255,7 +255,7 @@ Wizualizacja rozmieszczenia klientów oraz efektywności łańcucha dostaw na te
 
 ![Geo Dashboard](readme_images/D2.png)
 
-### 3. Produkty i Zadowolenie Klientów (CRM)
+### 3. Zadowolenie Klientów (CRM)
 Zaawansowana analityka zachowań klientów i retencji.
 
 * **Segmentacja RFM (Recency, Frequency, Monetary):** Podział bazy klientów na segmenty (m.in. "Champions", "Lost", "Promising") w celu personalizacji komunikacji. Wizualizacja uwypukla dominację segmentu "Lost".
