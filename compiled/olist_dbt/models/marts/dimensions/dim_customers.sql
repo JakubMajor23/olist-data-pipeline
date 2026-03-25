@@ -60,3 +60,12 @@ LEFT JOIN "dwh"."raw_data"."dim_geolocation" AS g
     ON dc.customer_zip_code_prefix = g.geolocation_zip_code_prefix
 WHERE
     dc.rn = 1
+
+UNION ALL
+
+SELECT
+    'unknown' AS customer_unique_id,
+    'unknown' AS customer_city,
+    'NA' AS customer_state,
+    MD5('unknown') AS customer_key,
+    MD5('unknown') AS geolocation_key

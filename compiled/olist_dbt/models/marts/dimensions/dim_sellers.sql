@@ -20,3 +20,13 @@ FROM
 LEFT JOIN
     dim_geolocation AS g
     ON s.seller_zip_code_prefix = g.geolocation_zip_code_prefix
+
+UNION ALL
+
+SELECT
+    'unknown' AS seller_id,
+    'unknown' AS seller_zip_code_prefix,
+    'unknown' AS seller_city,
+    'NA' AS seller_state,
+    MD5('unknown') AS seller_key,
+    MD5('unknown') AS geolocation_key

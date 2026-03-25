@@ -16,7 +16,7 @@ with all_values as (
 select *
 from all_values
 where value_field not in (
-    'delivered','shipped','canceled','invoiced','processing','approved','unavailable','created'
+    'delivered','shipped','canceled','invoiced','processing','approved','unavailable','created','unknown'
 )
 
 
