@@ -1,7 +1,6 @@
 version: '3.8'
 
 x-airflow-common: &airflow-common
-  # CHANGE 1: Use 'build' instead of 'image' to install dbt from your Dockerfile
   build: .
   env_file: 
     - .env
@@ -9,7 +8,7 @@ x-airflow-common: &airflow-common
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow-meta/airflow
     - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    - AIRFLOW_CONN_POSTGRES_DWH=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-dwh:5432/${POSTGRES_DB}
+    - AIRFLOW_CONN_POSTGRES_DWH=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DWH_POSTGRES_DOCKER_HOST:-postgres-dwh}:${DWH_POSTGRES_DOCKER_PORT:-5432}/${POSTGRES_DB}
     - DBT_PROFILES_DIR=/opt/airflow/olist_dbt
     - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
     - AIRFLOW__WEBSERVER__SECRET_KEY=my_super_secret_key_fix_403
@@ -20,17 +19,16 @@ x-airflow-common: &airflow-common
     - ./dags:/opt/airflow/dags
     - ./scripts:/opt/airflow/scripts
     - ./olist_dbt:/opt/airflow/olist_dbt
+    - ./data:/opt/airflow/data
   depends_on:
     - postgres-airflow-meta
 
 services:
-  # --- SERVICE 1: Initialization (Required on first run!) ---
   airflow-init:
     <<: *airflow-common
     command: version
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow-meta/airflow
-      # Creates default user admin/admin
       - _AIRFLOW_DB_UPGRADE=true
       - _AIRFLOW_WWW_USER_CREATE=true
       - _AIRFLOW_WWW_USER_USERNAME=airflow
@@ -38,7 +36,6 @@ services:
     depends_on:
       - postgres-airflow-meta
 
-  # --- SERVICE 2: Webserver ---
   airflow-webserver:
     <<: *airflow-common
     command: webserver
@@ -51,9 +48,8 @@ services:
       retries: 5
     restart: always
     depends_on:
-      - airflow-init # Wait for init to finish creating tables!
+      - airflow-init
 
-  # --- SERVICE 3: Scheduler ---
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
@@ -66,7 +62,6 @@ services:
     depends_on:
       - airflow-init
 
-  # --- DB 1: Airflow Metadata ---
   postgres-airflow-meta:
     image: postgres:16
     container_name: postgres-airflow-meta
@@ -76,8 +71,13 @@ services:
       - POSTGRES_DB=airflow
     volumes:
       - airflow_meta_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  # --- DB 2: Olist Source (Production) ---
   postgres-olist-source:
     image: postgres:16
     container_name: postgres-olist-source
@@ -86,14 +86,18 @@ services:
       - POSTGRES_PASSWORD=${SOURCE_POSTGRES_PASSWORD}
       - POSTGRES_DB=${SOURCE_POSTGRES_DB}
     ports:
-      - "5433:5432" # Host: 5433 -> Internal: 5432
+      - "${SOURCE_POSTGRES_PORT:-5433}:5432"
     volumes:
       - olist_source_data:/var/lib/postgresql/data
-      # If you have an SQL initialization script, uncomment:
       - ./init-scripts-olist:/docker-entrypoint-initdb.d
       - ./data:/data-csv
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
-  # --- DB 3: Data Warehouse (Target) ---
   postgres-dwh:
     image: postgres:16
     container_name: postgres-dwh
@@ -102,10 +106,15 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "5434:5432" # Host: 5434 -> Internal: 5432
+      - "${DWH_POSTGRES_PORT:-5434}:5432"
     volumes:
       - dwh_data:/var/lib/postgresql/data
-      - ./data:/data-csv
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   olist_source_data:
