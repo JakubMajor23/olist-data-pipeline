@@ -1,18 +1,13 @@
-import pandas as pd
-from sqlalchemy import create_engine
-import os
 import logging
-from dotenv import load_dotenv
+from typing import Callable, Dict, List, Sequence, Tuple
 
-# --- 1. CONFIGURATION & LOGGING ---
+import pandas as pd
+from sqlalchemy import bindparam, create_engine, text
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.engine import Connection, Engine
 
-# Load environment variables from .env file (must be in root directory)
-# We go up one level from 'scripts' to find .env
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.join(SCRIPT_DIR, '..')
-load_dotenv(os.path.join(ROOT_DIR, '.env'))
+from db_config import ROOT_DIR, get_source_db_config
 
-# Logging Setup
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -20,24 +15,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Paths
-CSV_PATH = os.path.join(ROOT_DIR, 'data')
+CSV_DIR = ROOT_DIR / 'data'
 
-# Database Credentials (Safe & Secure)
-try:
-    DB_USER = os.environ["SOURCE_POSTGRES_USER"]
-    DB_PASS = os.environ["SOURCE_POSTGRES_PASSWORD"]
-    DB_NAME = os.environ["SOURCE_POSTGRES_DB"]
-except KeyError as e:
-    raise RuntimeError(f"CONFIGURATION ERROR: Missing environment variable {e}. Please ensure that the .env file exists!")
 
-DB_PORT = "5433"  # Mapped port for Source DB
-DB_HOST = "localhost"
-
-DB_CONNECTION_STR = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-
-# File Mapping: Logical Name -> CSV Filename
-FILES = {
+DATASET_FILES: Dict[str, str] = {
     'orders': 'olist_orders_dataset.csv',
     'items': 'olist_order_items_dataset.csv',
     'payments': 'olist_order_payments_dataset.csv',
@@ -49,46 +30,154 @@ FILES = {
 }
 
 
-# --- 2. HELPER FUNCTIONS ---
-
-def get_engine():
-    """Creates and returns a SQLAlchemy engine for the source database."""
-    return create_engine(DB_CONNECTION_STR)
+def get_engine() -> Engine:
+    return create_engine(get_source_db_config().sqlalchemy_url())
 
 
-def load_static_data():
+def _read_csv(dataset_key: str, **kwargs: object) -> pd.DataFrame:
+    file_path = CSV_DIR / DATASET_FILES[dataset_key]
+    if not file_path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    return pd.read_csv(file_path, **kwargs)
+
+
+def _build_upsert_method(conflict_columns: Sequence[str]) -> Callable[..., int]:
+    """Builds a pandas to_sql callback that performs PostgreSQL upserts."""
+
+    def upsert_method(table: object, conn: Connection, keys: List[str], data_iter: object) -> int:
+        rows = [dict(zip(keys, row)) for row in data_iter]
+        if not rows:
+            return 0
+
+        stmt = insert(table.table).values(rows)
+        update_columns = {
+            column.name: stmt.excluded[column.name]
+            for column in table.table.columns
+            if column.name not in conflict_columns
+        }
+
+        if update_columns:
+            stmt = stmt.on_conflict_do_update(
+                index_elements=list(conflict_columns),
+                set_=update_columns
+            )
+        else:
+            stmt = stmt.on_conflict_do_nothing(index_elements=list(conflict_columns))
+
+        result = conn.execute(stmt)
+        return result.rowcount if result.rowcount is not None else 0
+
+    return upsert_method
+
+
+def _write_dataframe_to_sql(
+        df: pd.DataFrame,
+        table_name: str,
+        conn: Connection,
+        method: Callable[..., int] | None = None
+) -> None:
+    """Helper to write a DataFrame to PostgreSQL using the current transaction."""
+    if df.empty:
+        return
+
+    df.to_sql(
+        name=table_name,
+        con=conn,
+        schema='public',
+        if_exists='append',
+        index=False,
+        chunksize=1000,
+        method=method
+    )
+
+
+def _delete_rows_by_ids(
+        conn: Connection,
+        table_name: str,
+        id_column: str,
+        ids: Sequence[str]
+) -> None:
+    """Deletes rows matching the provided identifiers."""
+    if not ids:
+        return
+
+    delete_stmt = text(
+        f"DELETE FROM public.{table_name} WHERE {id_column} IN :ids"
+    ).bindparams(bindparam("ids", expanding=True))
+    conn.execute(delete_stmt, {"ids": list(ids)})
+
+
+def _cleanup_monthly_data(
+        conn: Connection,
+        target_order_ids: Sequence[str],
+        target_customer_ids: Sequence[str],
+        year: int,
+        month: int
+) -> None:
+    """Removes the target month from the source DB before reloading it."""
+    logger.info(f"Cleaning existing source data for {year}-{month:02d} before reload...")
+
+    _delete_rows_by_ids(conn, 'olist_order_items_dataset', 'order_id', target_order_ids)
+    _delete_rows_by_ids(conn, 'olist_order_payments_dataset', 'order_id', target_order_ids)
+    _delete_rows_by_ids(conn, 'olist_order_reviews_dataset', 'order_id', target_order_ids)
+    _delete_rows_by_ids(conn, 'olist_orders_dataset', 'order_id', target_order_ids)
+
+    if target_customer_ids:
+        delete_customers_stmt = text("""
+            DELETE FROM public.olist_customers_dataset AS c
+            WHERE c.customer_id IN :customer_ids
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM public.olist_orders_dataset AS o
+                  WHERE o.customer_id = c.customer_id
+              )
+        """).bindparams(bindparam("customer_ids", expanding=True))
+        conn.execute(delete_customers_stmt, {"customer_ids": list(target_customer_ids)})
+
+
+def load_static_data() -> None:
     """
-    Loads reference data that doesn't change over time (Products, Sellers, Geo).
+    Loads reference data (Products, Sellers, Geolocation) that doesn't change over time.
     Should be run once at the beginning of the simulation.
     """
     engine = get_engine()
     logger.info("--- Starting Static Data Load (Reference Data) ---")
 
-    static_tables = ['products', 'sellers', 'geolocation']
+    products_df = _read_csv('products')
+    sellers_df = _read_csv('sellers')
+    geolocation_df = _read_csv('geolocation')
 
-    for key in static_tables:
-        logger.info(f"Processing: {key}...")
-        file_path = os.path.join(CSV_PATH, FILES[key])
+    try:
+        with engine.begin() as conn:
+            logger.info("Processing: products...")
+            _write_dataframe_to_sql(
+                products_df,
+                'olist_products_dataset',
+                conn,
+                method=_build_upsert_method(['product_id'])
+            )
+            logger.info(f" -> [OK] olist_products_dataset: synchronized {len(products_df)} rows.")
 
-        if not os.path.exists(file_path):
-            logger.error(f"File not found: {file_path}")
-            continue
+            logger.info("Processing: sellers...")
+            _write_dataframe_to_sql(
+                sellers_df,
+                'olist_sellers_dataset',
+                conn,
+                method=_build_upsert_method(['seller_id'])
+            )
+            logger.info(f" -> [OK] olist_sellers_dataset: synchronized {len(sellers_df)} rows.")
 
-        try:
-            df = pd.read_csv(file_path)
-            rows_in_csv = len(df)
-
-            # if_exists='append': We don't drop tables (to preserve Foreign Keys), just append.
-            # Ideally, this should use 'replace' only if tables are empty or constraints allow.
-            table_name = f'olist_{key}_dataset'
-            df.to_sql(table_name, engine, schema='public', if_exists='append', index=False, chunksize=1000)
-
-            logger.info(f" -> [OK] {table_name}: Loaded {rows_in_csv} rows.")
-        except Exception as e:
-            logger.error(f" -> [ERROR] Failed to load {key}: {e}")
+            logger.info("Processing: geolocation...")
+            conn.execute(text("TRUNCATE TABLE public.olist_geolocation_dataset"))
+            _write_dataframe_to_sql(geolocation_df, 'olist_geolocation_dataset', conn)
+            logger.info(f" -> [OK] olist_geolocation_dataset: reloaded {len(geolocation_df)} rows.")
+    except Exception:
+        logger.exception("Static data load failed. Rolled back all reference data changes.")
+        raise
 
 
-def load_monthly_data(year, month):
+def load_monthly_data(year: int, month: int) -> None:
     """
     Simulates monthly transaction flow.
     Loads Orders, Items, Payments, Reviews, and Customers for a specific month.
@@ -97,85 +186,75 @@ def load_monthly_data(year, month):
     logger.info(f"\n--- Simulation Started for Period: {year}-{month:02d} ---")
 
     # --- A. DATA PREPARATION (Filtering) ---
-
-    # 1. Load Orders
-    orders_path = os.path.join(CSV_PATH, FILES['orders'])
-    df_orders = pd.read_csv(orders_path)
+    df_orders = _read_csv('orders')
     df_orders['order_purchase_timestamp'] = pd.to_datetime(df_orders['order_purchase_timestamp'])
 
-    # Filter by Year/Month
-    mask = (df_orders['order_purchase_timestamp'].dt.year == year) & \
-           (df_orders['order_purchase_timestamp'].dt.month == month)
+    mask = (
+        (df_orders['order_purchase_timestamp'].dt.year == year) &
+        (df_orders['order_purchase_timestamp'].dt.month == month)
+    )
     monthly_orders = df_orders[mask]
 
     if monthly_orders.empty:
         logger.warning(f"No orders found for {year}-{month:02d}. Skipping.")
         return
 
-    # Get relevant IDs to filter related tables
-    target_order_ids = monthly_orders['order_id'].unique()
-    target_customer_ids = monthly_orders['customer_id'].unique()
+    target_order_ids = monthly_orders['order_id'].drop_duplicates().tolist()
+    target_customer_ids = monthly_orders['customer_id'].drop_duplicates().tolist()
 
     logger.info(f"Processing {len(monthly_orders)} orders...")
 
-    # 2. Load Related Data (Filtered)
-    # Customers
-    df_customers = pd.read_csv(os.path.join(CSV_PATH, FILES['customers']))
+    # Load Related Data (Filtered)
+    df_customers = _read_csv('customers')
     monthly_customers = df_customers[df_customers['customer_id'].isin(target_customer_ids)]
 
-    # Items
-    df_items = pd.read_csv(os.path.join(CSV_PATH, FILES['items']))
+    df_items = _read_csv('items')
     monthly_items = df_items[df_items['order_id'].isin(target_order_ids)]
 
-    # Payments
-    df_payments = pd.read_csv(os.path.join(CSV_PATH, FILES['payments']))
+    df_payments = _read_csv('payments')
     monthly_payments = df_payments[df_payments['order_id'].isin(target_order_ids)]
 
-    # Reviews
-    df_reviews = pd.read_csv(os.path.join(CSV_PATH, FILES['reviews']))
+    df_reviews = _read_csv('reviews')
     monthly_reviews = df_reviews[df_reviews['order_id'].isin(target_order_ids)]
-
-    counts = {
-        'Customers': len(monthly_customers),
-        'Orders': len(monthly_orders),
-        'Items': len(monthly_items),
-        'Payments': len(monthly_payments),
-        'Reviews': len(monthly_reviews)
-    }
 
     # --- B. DATABASE INGESTION ---
     # Insertion order matters due to Foreign Key constraints:
-    # 1. Customers (must exist before Orders)
-    # 2. Orders (must exist before Items/Payments/Reviews)
-    # 3. Details (Items, Payments, Reviews)
+    # 1. Customers -> 2. Orders -> 3. Details (Items, Payments, Reviews)
+    ingestion_plan: List[Tuple[str, pd.DataFrame, str, Callable[..., int] | None]] = [
+        (
+            'Customers',
+            monthly_customers,
+            'olist_customers_dataset',
+            _build_upsert_method(['customer_id'])
+        ),
+        ('Orders', monthly_orders, 'olist_orders_dataset', None),
+        ('Items', monthly_items, 'olist_order_items_dataset', None),
+        ('Payments', monthly_payments, 'olist_order_payments_dataset', None),
+        ('Reviews', monthly_reviews, 'olist_order_reviews_dataset', None)
+    ]
 
     try:
-        monthly_customers.to_sql('olist_customers_dataset', engine, schema='public', if_exists='append', index=False)
-        logger.info(f" -> Added Customers: {counts['Customers']}")
+        with engine.begin() as conn:
+            _cleanup_monthly_data(conn, target_order_ids, target_customer_ids, year, month)
 
-        monthly_orders.to_sql('olist_orders_dataset', engine, schema='public', if_exists='append', index=False)
-        logger.info(f" -> Added Orders:    {counts['Orders']}")
-
-        monthly_items.to_sql('olist_order_items_dataset', engine, schema='public', if_exists='append', index=False)
-        logger.info(f" -> Added Items:     {counts['Items']}")
-
-        monthly_payments.to_sql('olist_order_payments_dataset', engine, schema='public', if_exists='append',
-                                index=False)
-        logger.info(f" -> Added Payments:  {counts['Payments']}")
-
-        monthly_reviews.to_sql('olist_order_reviews_dataset', engine, schema='public', if_exists='append', index=False)
-        logger.info(f" -> Added Reviews:   {counts['Reviews']}")
-
-    except Exception as e:
-        logger.critical(f"Database insertion failed: {e}")
-        return
+            for label, df, table_name, method in ingestion_plan:
+                _write_dataframe_to_sql(df, table_name, conn, method=method)
+                logger.info(f" -> Added {label}: {len(df)}")
+    except Exception:
+        logger.exception(
+            "Monthly simulation failed for %s-%02d. Rolled back all writes for this period.",
+            year,
+            month
+        )
+        raise
 
     logger.info("SUCCESS: Simulation completed for this month.")
 
 
-if __name__ == "__main__":
+def _run_interactive_mode() -> None:
+    """Handles the CLI interaction if script is run directly."""
     print("\n--- OLIST DATA SIMULATOR ---")
-    print(" [1] Initialization (Load Products, Sellers, Geo - Run ONCE)")
+    print(" [1] Initialization (Load Products, Sellers, Geolocation - Run ONCE)")
     print(" [2] Simulate Specific Month")
 
     mode = input("Select mode: ")
@@ -188,6 +267,13 @@ if __name__ == "__main__":
             m = int(input("Enter month (e.g., 1): "))
             load_monthly_data(y, m)
         except ValueError:
-            print("Invalid input! Please enter numbers.")
+            print("Invalid input! Please enter valid integer numbers.")
     else:
-        print("Unknown option.")
+        print("Unknown option. Exiting.")
+
+
+if __name__ == "__main__":
+    try:
+        _run_interactive_mode()
+    except KeyboardInterrupt:
+        logger.warning("\nSimulator stopped by user.")
