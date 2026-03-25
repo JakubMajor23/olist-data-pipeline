@@ -1,280 +1,274 @@
 <div align="center">
 
 <p>
-  <strong>🇺🇸 English</strong> | <a href="README.pl.md">🇵🇱 Polski</a>
+  <strong>English</strong> | <a href="README.pl.md">Polski</a>
 </p>
 
-# Olist E-commerce Data Pipeline
+# Olist Data Pipeline
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.7%2B-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white)
-![dbt](https://img.shields.io/badge/dbt--Core-FF694B?style=for-the-badge&logo=dbt&logoColor=white)
+![Airflow](https://img.shields.io/badge/Apache%20Airflow-2.10.2-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white)
+![dbt](https://img.shields.io/badge/dbt--postgres-1.8.2-FF694B?style=for-the-badge&logo=dbt&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker--Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![SQLFluff](https://img.shields.io/badge/SQLFluff-Expected_Quality-00C7B7?style=for-the-badge&logo=sql&logoColor=white)
-![CI Status](https://github.com/jakubmajor23/olist-data-pipeline/actions/workflows/ci_checks.yml/badge.svg)
-![Power Bi](https://img.shields.io/badge/power_bi-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
-<br>
+![Python](https://img.shields.io/badge/Python-CI%20checks-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker%20Compose-stack-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![SQLFluff](https://img.shields.io/badge/SQLFluff-Postgres%20%2B%20dbt-00C7B7?style=for-the-badge)
+![Power BI](https://img.shields.io/badge/Power%20BI-report-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 
-**Complete, scalable ELT (Extract, Load, Transform) system simulating a production e-commerce environment.**
+Portfolio ELT project built around the Olist e-commerce dataset. The repository simulates monthly source-system ingestion into PostgreSQL, loads a raw warehouse layer with Apache Airflow, and transforms the data into analytics models with dbt.
 
-[Context](#-context--goals) •
-[Tech Stack](#-tech-stack) •
-[Architecture](#-architecture--data-flow) •
-[Key Solutions](#-key-technical-solutions) •
-[Setup](#-setup--usage)
+**Live dbt docs:** <https://jakubmajor23.github.io/olist-data-pipeline/>
 
 </div>
 
 ---
 
-## Context & Goals
+## What This Repository Currently Contains
 
-**Problem:** Raw Olist data consists of scattered transaction logs. Analyzing revenue, delivery delays, or customer retention requires joining multiple tables, which is inefficient for real-time reporting.
+- A Docker Compose stack with Apache Airflow, a simulated source PostgreSQL database, a warehouse PostgreSQL database, and a separate Airflow metadata database.
+- Two Airflow DAGs:
+  - `simulate_source_system`
+  - `olist_elt_pipeline`
+- A dbt project with 20 SQL models:
+  - 9 staging models
+  - 5 dimensions
+  - 2 lookup dimensions
+  - 4 fact tables
+- Three dbt seed files:
+  - `order_statuses.csv`
+  - `payments_types.csv`
+  - `product_category_name_translation.csv`
+- Three custom dbt SQL tests:
+  - `assert_delivered_orders_are_approved.sql`
+  - `assert_delivered_orders_have_dates.sql`
+  - `assert_fallback_members_exist.sql`
+- GitHub Actions workflows for Python linting (Ruff), SQL linting (SQLFluff), and dbt docs deployment.
+- A Power BI report file committed as `report.pbix`.
 
-**Solution:** An automated data pipeline that transforms raw logs into a clean **Galaxy Schema** (Fact Constellation) within the Data Warehouse.
+## Architecture
 
-### Project Documentation (Live)
-The project includes fully generated dbt documentation available online:
-**[Click here to view Data Lineage and Data Dictionary](https://jakubmajor23.github.io/olist-data-pipeline/)**
+### Runtime components
 
-### Main Objectives
-- **Single Source of Truth:** Centralized data for Orders, Payments, and Products.
-- **Scalability:** Implemented **Incremental Loading** to handle growing data volumes efficiently.
-- **Data Quality:** Enforced Referential Integrity, Idempotency, and automated `dbt` tests.
-
----
-
-## Tech Stack
-
-The project adheres to **Modern Data Stack** principles:
-
-| Area | Implementation |
+| Component | Current implementation |
 | :--- | :--- |
-| **Orchestration** | **Event-Driven Airflow**: DAGs are triggered via REST API immediately after new data arrival (simulated). |
-| **Modeling** | **Galaxy Schema**: Fact Constellation architecture (3 fact tables) eliminating Fan-out and Cartesian product issues. |
-| **Transformation** | **dbt Core**: Models materialized as `incremental` and `table`, utilizing Jinja macros (DRY) and data tests. |
-| **Code Quality** | **SQLFluff**: SQL Linter ensuring consistent code style and Postgres dialect compliance. |
-| **Infrastructure** | **Docker & Docker Compose**: Full containerization of Airflow (with dbt) and Postgres database. |
-| **Automation** | **GitHub Actions (CI/CD)**: Automated Linting on PRs and Documentation Deployment. |
+| Orchestration | Apache Airflow `LocalExecutor` in Docker |
+| Source layer | PostgreSQL service `postgres-olist-source` |
+| Warehouse raw layer | PostgreSQL service `postgres-dwh`, schema `raw_data` |
+| dbt target schema | `main` in Docker, `dwh_main_dev` for local dbt runs |
+| Metadata DB | PostgreSQL service `postgres-airflow-meta` |
+| Transformations | dbt Core with `dbt-postgres` |
+| SQL linting | SQLFluff with dbt templater and Postgres dialect |
+| Python checks | Ruff linter in CI |
 
----
+### Pipeline flow
 
-## Architecture & Data Flow
+> **Note:** The `simulate_source_system` DAG is not part of the core analytics pipeline. It is purely infrastructure designed to mock the natural behavior of the e-commerce platform's users and simulate the passage of time.
 
-The system is designed with modularity in mind, separating the simulation layer from the actual processing pipeline.
+1. `simulate_source_system` runs on a monthly schedule from `2016-09-01` through `2018-12-01`, with `catchup=True`, `depends_on_past=True`, and `max_active_runs=1`.
+2. On the first logical month only, it loads static reference data into the source database:
+   - products
+   - sellers
+   - geolocation
+3. On every logical month, it loads that month's transactional data into the source database:
+   - customers
+   - orders
+   - order items
+   - payments
+   - reviews
+4. The DAG then triggers `olist_elt_pipeline` with the same `logical_date` and waits for completion.
+5. `olist_elt_pipeline` creates the `raw_data` schema if needed, fully refreshes static raw tables, deletes the target month from transactional raw tables, reloads that month, and then runs:
+   - `dbt seed --target docker`
+   - `dbt run --target docker`
+   - `dbt test --target docker`
 
-### End-to-End Data Lifecycle
 
-The process simulates a real-world Data Warehouse operation in incremental mode:
+## dbt Model
 
-1.  **Transaction Simulation (`simulate_production.py`):**
-    Fetches historical data (month by month) and loads it into the operational database (`postgres-olist-source`), preserving strict Foreign Key constraints (Customers → Orders → Payments).
+The dbt project reads raw Olist tables from the `raw_data` schema and builds a warehouse model in two layers.
 
-2.  **Trigger API (`run_demo.py`):**
-    Immediately after loading, the orchestrator sends a POST request to the Airflow REST API, passing the `logical_date`. This ensures precise processing of only the new time slice.
+### Staging layer
 
-3.  **Extract & Load (Airflow DAG):**
-    * **Idempotency:** Before loading, the DAG cleans up the `raw_data` layer for the target month to prevent duplicates.
-    * **Transfer:** Data is moved from Source DB to DWH (Raw Layer) using efficient SQLAlchemy engines.
+- `stg__customers`
+  - normalizes city name (lowercase, trimmed) and state code (uppercase, trimmed)
+- `stg__orders`
+  - normalizes delivered orders with missing delivery timestamps to status `shipped`
+  - imputes missing `order_approved_at` for delivered orders with the purchase timestamp
+  - keeps an audit flag `is_approval_date_imputed`
+- `stg__order_items`
+  - builds a deterministic surrogate key from `order_id` and `order_item_id`
+  - loads incrementally by joining to orders for the newly loaded period
+- `stg__payments`
+  - builds a surrogate key from `order_id` and `payment_sequential`
+  - carries `order_purchase_timestamp` for incremental logic
+- `stg__reviews`
+  - deduplicates by `review_id`
+  - keeps the latest `review_answer_timestamp`
+  - fills missing text with `No Title` and `No Comment`
+- `stg__products`
+  - translates product categories from Portuguese to English through a seed join
+  - drops rows with missing physical dimensions or weight
+- `stg__sellers`
+  - casts columns to explicit types for consistency
+- `stg__geolocation`
+  - removes rows with missing coordinates
+  - adds an `is_valid_brazilian_location` flag
 
-4.  **Transformation (dbt):**
-    Airflow triggers a dbt container (`dbt run`). Raw data is cleaned (Staging) and modeled into Facts and Dimensions (Marts).
+### Marts layer
 
-5.  **Validation (`validate_data.py`):**
-    A QA script verifies data integrity by comparing row counts between original CSV files and the **Source DB**, ensuring the simulation ran without data loss.
+Facts:
 
----
+- `fact_orders`
+- `fact_sales_items`
+- `fact_payments`
+- `fact_reviews`
 
-## Transformation Details (dbt)
+Dimensions and lookups:
 
-The transformation layer is divided into two stages following Analytics Engineering best practices:
+- `dim_customers`
+- `dim_date`
+- `dim_geolocation`
+- `dim_products`
+- `dim_sellers`
+- `dim_order_status`
+- `dim_payment_type`
 
-### Staging Layer (Raw -> Staging)
-* Materialized as `incremental` for high-volume tables (Orders, Payments) and `table` for dictionaries.
-* **Fail Fast** logic: `dbt_project.yml` enforces uniqueness tests on primary keys.
+Implemented modeling patterns visible in the current SQL:
 
-### Marts Layer (Staging -> Facts/Dims)
-The **Galaxy Schema** model connects business processes via *Conformed Dimensions*.
-
-| Fact Table | Logic & Purpose |
-| :--- | :--- |
-| **fact_orders** | Central transactional table. Aggregates cart values (`SUM(price)`), freight costs, and combines order statuses with reviews. |
-| **fact_sales_items** | Granular table (Product-in-Cart level). Enables sales analysis by Product (`product_id`) and Seller (`seller_id`). |
-| **fact_payments** | Analysis of cash flows, payment types (credit card, voucher), and installments (`payment_installments`). |
-| **fact_reviews** | Dedicated fact table for handling review text and scores, resolving data loss issues (recovering 100k+ reviews vs 3k). |
-
----
-
-## Key Technical Solutions
-
-This project implements advanced Data Engineering patterns beyond standard ETL tutorials.
-
-### 1. Performance & Modeling (dbt)
-* **Fan-out Elimination (Galaxy Schema):** Deliberate decision to split data into 3 fact tables (`fact_orders`, `fact_sales_items`, `fact_payments`). This prevents Cartesian explosion (row duplication) and aggregation errors common in One-to-Many-to-Many relationships.
-* **Surrogate Keys & Incremental Logic:** The `stg__order_items` table lacks a native primary key. This was solved by generating a deterministic surrogate key using `MD5(order_id || '-' || item_id)` to enable efficient incremental loading.
-* **Ghost Records (Unknown Members):** Handling missing foreign keys (e.g., in `dim_products`). Invalid relationships are mapped to an artificial `MD5('unknown')` record to prevent data loss in `INNER JOIN` operations.
-
-### 2. Architecture & Reliability
-* **Transactional Idempotency (Savepoints):** Custom Airflow mechanism (`begin_nested()`) ensures data for the target period is cleared before reloading. This guarantees no duplicates and safe rollbacks.
-* **Fail-Fast Strategy:** The pipeline intentionally breaks at startup if critical environment variables (passwords) are missing, preventing "silent failures" or insecure operations.
-* **Integrity Simulation:** The data loader emulator respects Foreign Key constraints, inserting data in the correct order.
-
-### 3. Data Quality & Cleaning
-* **Data Repair (Imputation):** Staging logic imputes missing `order_approved_at` timestamps using the purchase date, flagging the record with `is_imputed`.
-* **Geo Validation (Data Enrichment):** Instead of hard deletion, data is enriched with quality metadata. Coordinates falling outside Brazil's boundaries receive `is_valid_brazilian_location = False`.
-* **Golden Record (Customers):** `dim_customers` uses window functions to deduplicate address changes, selecting the most recent location data.
-
-### 4. Data Quality & Findings
-* **Review Data Recovery:** Addressed a critical data loss issue where only ~3,110 reviews were initially captured. By decoupling reviews into `fact_reviews`, the system now correctly handles over 100k review records from the source CSV.
-* **Geolocation Aggregation:** The raw dataset contains ~1 million geolocation records. These are aggressively aggregated to ~19k unique `zip_code_prefix` entries in `dim_geolocation` to serve as a lookup table, with 100% prefix coverage.
-* **Customer Deduplication:** Removed ~3,345 duplicate customer records to ensure `customer_unique_id` integrity.
-* **Staging Cleaning:** One product record is intentionally dropped during `stg_products` processing due to missing or invalid critical fields.
-
-### 5. Configuration & Usability
-* **Code as Configuration (Seeds):** Mapping dictionaries (e.g., order statuses) are managed as `dbt seeds` (CSV) rather than hardcoded `CASE WHEN` statements in SQL. This allows business analysts to update rules without modifying engineering code.
-* **Translation Layer:** Automatic standardization of product categories (PT -> EN) via dictionary joins, adhering to DRY principles and simplifying global reporting.
-
-### 6. Automation (CI/CD)
-* **Automated Linting (CI):** Every Pull Request is verified by **GitHub Actions** running `sqlfluff`. This blocks non-compliant code from being merged.
-* **Documentation Deployment (CD):** The documentation deployment process is fully automated. Upon merging to `main`, GitHub Actions spins up a **temporary database service**, compiles the dbt project, and publishes the updated site to GitHub Pages.
-
----
-
-## Data Model
-
-### Galaxy Schema
-The project utilizes a **Fact Constellation** architecture where three fact tables share **Conformed Dimensions**.
+- `dim_customers` keeps one record per `customer_unique_id`, choosing the latest address by order timestamp.
+- `dim_geolocation` aggregates source rows to one record per `geolocation_zip_code_prefix`.
+- Several dimensions add fallback members such as `MD5('unknown')` or `MD5('not_defined')`.
+- The custom dbt test `assert_fallback_members_exist.sql` checks that those fallback members exist.
 
 <div align="center">
-  <img src="readme_images/dwh.png" alt="Data Warehouse Architecture" width="100%">
+  <img src="readme_images/dwh.png" alt="Data warehouse diagram" width="100%">
 </div>
 
-| Fact Table | Description |
-| :--- | :--- |
-| **fact_orders** | Central transactional table. Aggregates cart values, freight costs, and combines statuses with reviews. |
-| **fact_sales_items** | Granular table. Enables sales analysis by Product and Seller. |
-| **fact_payments** | Analysis of cash flows, payment types, and installments. |
-| **fact_reviews** | Dedicated fact table for reviews and scores. |
-
-### Key Modeling Decisions
-* **Role-Playing Dimensions:** `dim_date` connects to `fact_orders` multiple times. This allows simultaneous analysis of different lifecycle events (Purchase Date, Approved Date, Delivered Date) using a single physical calendar table.
-* **Outrigger Dimension:** `dim_geolocation` is linked to `dim_customer` and `dim_seller` rather than directly to facts. This normalization reduces address data redundancy.
-
----
-
-## Project Structure
-
-```bash
-.
-├── dags/                   # Airflow DAG definitions
-│   └── olist_elt_dump_dag.py
-├── olist_dbt/              # dbt transformation project
-│   ├── models/
-│   │   ├── staging/        # Intermediate models (Cleaning, Surrogate Keys)
-│   │   └── marts/          # Business models (Galaxy Schema, Ghost Records)
-│   ├── seeds/              # Static files (CSV lookups)
-│   └── dbt_project.yml
-├── scripts/                # Helper scripts
-│   ├── run_demo.py         # Simulation orchestrator
-│   ├── simulate_production.py
-│   └── validate_data.py    # QA Script
-├── docker-compose.yml      # Infrastructure definition
-├── .sqlfluff               # SQL Linter config
-├── requirements.txt        # Python dependencies
-└── README.md
-```
-
-## Setup & Usage
+## Quick Start
 
 ### Prerequisites
-* Docker & Docker Compose
-* Python 3.10+
 
-### Quick Start
+- Docker Desktop or Docker Engine with Compose v2
 
-#### 1. Environment Setup
-Copy the example configuration file (contains default passwords for the dev environment).
+### 1. Create `.env`
 
 ```bash
-# Windows:
-copy .env.example .env
-# Linux / MacOS:
+# Windows PowerShell
+Copy-Item .env.example .env
+
+# Linux / macOS
 cp .env.example .env
 ```
 
-#### 2. Start Infrastructure
-Launch Database and Airflow containers.
+The example file defines these default host ports:
+
+| Service | Host port |
+| :--- | :--- |
+| Airflow web UI | `8080` |
+| Source PostgreSQL | `5433` |
+| DWH PostgreSQL | `5434` |
+
+### 2. Start the stack
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
-#### 3. Run Simulation (Demo)
-The `run_demo.py` script will automatically:
-* Create a virtual environment (optional).
-* Simulate historical data ingestion (month by month).
-* Trigger Airflow DAGs.
+### 3. Open Airflow
 
-```bash
-# Prepare Python environment
-python -m venv .venv
+- URL: <http://localhost:8080>
+- Default credentials from `docker-compose.yml`:
+  - username: `airflow`
+  - password: `airflow`
 
-# Windows:
-.\.venv\Scripts\activate
-# Linux / MacOS:
-source .venv/bin/activate
+### 4. Run the historical backfill
 
-pip install -r requirements.txt
+The intended Airflow entry point is `simulate_source_system`.
 
-# Start demo
-python scripts/run_demo.py
+- Unpause `simulate_source_system` in the Airflow UI.
+- Because the DAG uses `catchup=True`, Airflow will create monthly runs from September 2016 through December 2018.
+- Each run loads one month into the source DB and then triggers `olist_elt_pipeline` for the same logical month.
+
+## CI/CD and Documentation
+
+### CI workflow: `.github/workflows/ci_checks.yml`
+
+Runs on:
+
+- pull requests targeting `main`
+- pushes to `main`
+
+Current checks:
+
+- Ruff on `dags/` and `scripts/` with `--select E9,F63,F7,F82`
+- SQLFluff linting for `olist_dbt/models` from the repository root with the committed `.sqlfluff` config
+  - the workflow runs `dbt deps` first so package-based macros resolve exactly as in the project
+
+### Docs deployment: `.github/workflows/deploy_docs.yml`
+
+Runs on:
+
+- pushes to `main`
+- manual `workflow_dispatch`
+
+What it does now:
+
+- starts a temporary PostgreSQL 16 service in GitHub Actions
+- installs the pinned project requirements from `requirements.txt`
+- uses the committed `olist_dbt/profiles.yml`
+- runs `dbt deps`
+- runs `dbt docs generate --target docker`
+- deploys `olist_dbt/target` to the `gh-pages` branch
+
+Live site: <https://jakubmajor23.github.io/olist-data-pipeline/>
+
+## Repository Structure
+
+```text
+.
+|-- .env.example
+|-- .github/
+|   `-- workflows/
+|       |-- ci_checks.yml
+|       `-- deploy_docs.yml
+|-- .gitignore
+|-- .sqlfluff
+|-- dags/
+|   |-- olist_elt_pipeline_dag.py
+|   `-- simulate_source_system_dag.py
+|-- data/
+|-- docker-compose.yml
+|-- Dockerfile
+|-- docs/
+|-- init-scripts-olist/
+|-- olist_dbt/
+|   |-- dbt_project.yml
+|   |-- models/
+|   |-- packages.yml
+|   |-- profiles.yml
+|   |-- seeds/
+|   `-- tests/
+|-- readme_images/
+|-- README.md
+|-- README.pl.md
+|-- report.pbix
+|-- requirements.txt
+`-- scripts/
+    |-- db_config.py
+    |-- simulate_production.py
+    `-- validate_data.py
 ```
 
-## Analytics and Reporting (Power BI)
+## Power BI
 
-The presentation layer of the project was built using **Microsoft Power BI**. Data processed by dbt is visualized in the form of an interactive report, allowing for the analysis of e-commerce performance across three key dimensions.
+The repository includes:
 
-### 1. Executive Summary & Sales Overview
-The main managerial dashboard presenting the financial health of the business.
+- `report.pbix`
+- three dashboard screenshots in `readme_images/`
 
-* **KPI Overview:** Monitoring of key metrics: GMV, AOV, Order Count, and logistics indicators (Freight Ratio, Delivery Success Rate).
-* **Trend Analysis (Time Series):** Visualization of monthly sales (GMV) demonstrating seasonality and a general upward trend over a 2-year period.
-* **Pareto Analysis (80/20 Rule):** A combo chart identifying key sellers who generate the majority of total revenue.
-* **Payment Method Analysis:** Examination of the impact of payment type on Average Order Value (AOV), highlighting the dominance of *credit card installments*.
-
-![Sales Dashboard](readme_images/D1.png)
-
-### 2. Geographic Analysis & Logistics
-Visualization of customer distribution and supply chain efficiency across Brazil.
-
-* **Performance Indicators (KPIs):** Monitoring of on-time performance, average delays, and median *Lead Time*.
-* **Operational Funnel:** Visualization of order statuses in the pipeline to identify bottlenecks and monitor cancellation rates.
-* **Geospatial Analysis:** An *Average Delays by Region* map utilizing geolocation data to pinpoint logistically problematic areas.
-* **Correlation Study:** A *Scatter Plot* examining the relationship between delivery time and customer rating, confirming the hypothesis of a negative correlation between delays and *Review Score*.
-
-![Geo Dashboard](readme_images/D2.png)
-
-### 3. Customer Satisfaction
-Analysis of customer behavior and retention.
-
-* **RFM Segmentation (Recency, Frequency, Monetary):** Segmentation of the customer base (e.g., "Champions", "Lost", "Promising") for personalized communication strategies. The visualization highlights the dominance of the "Lost" segment.
-* **Cohort Analysis:** A retention matrix (*heatmap*) tracking customer return rates in subsequent months from the first purchase, revealing low long-term retention (<1% after month 1).
-* **Customer Value Comparison (AOV):** A comparison of one-time vs. returning customer basket value, proving the financial value of building loyalty.
-* **Loyalty Matrix:** A *Recency vs Frequency* heatmap allowing for a quick assessment of the customer base structure.
-
-![Product Dashboard](readme_images/D3.png)
-
-### Roadmap & Status
-
-- [x] Infrastructure: Dockerized Airflow & Postgres.
-- [x] ELT Logic: Custom Python Operators with transactional consistency.
-- [x] Transformation: dbt Incremental models & Galaxy Schema implementation.
-- [x] Orchestration: Event-driven architecture via Airflow API.
-- [x] QA: Automatic data validation (validate_data.py).
-- [x] Documentation: Hosted dbt docs on GitHub Pages.
-- [x] CI/CD: GitHub Actions pipelines.
-- [x] BI: Power BI Dashboards.
+<div align="center">
+  <img src="readme_images/D1.png" alt="Power BI dashboard 1" width="100%">
+  <img src="readme_images/D2.png" alt="Power BI dashboard 2" width="100%">
+  <img src="readme_images/D3.png" alt="Power BI dashboard 3" width="100%">
+</div>
 
 <div align="center">
 
