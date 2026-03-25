@@ -24,9 +24,8 @@ models:
               config:
                 where: "is_valid_brazilian_location = TRUE"
           - dbt_expectations.expect_column_values_to_be_between:
-              arguments:
-                min_value: -34.0
-                max_value: 6.0
+              min_value: -34.0
+              max_value: 6.0
               where: "is_valid_brazilian_location = TRUE"
 
       - name: geolocation_lng
@@ -36,9 +35,8 @@ models:
               config:
                 where: "is_valid_brazilian_location = TRUE"
           - dbt_expectations.expect_column_values_to_be_between:
-              arguments:
-                min_value: -74.0
-                max_value: -34.0
+              min_value: -74.0
+              max_value: -34.0
               where: "is_valid_brazilian_location = TRUE"
 
       - name: geolocation_city

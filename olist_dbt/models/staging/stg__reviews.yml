@@ -24,8 +24,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4, 5]
+              values: [1, 2, 3, 4, 5]
               config:
                 severity: error
 

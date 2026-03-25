@@ -13,9 +13,8 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('stg__orders')
-                field: order_id
+              to: ref('stg__orders')
+              field: order_id
 
       - name: payment_sequential
         description: "The sequence number for a payment method within a single order (e.g., 1, 2, 3...)."
@@ -29,8 +28,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['credit_card', 'boleto', 'voucher', 'debit_card', 'not_defined']
+              values: ['credit_card', 'boleto', 'voucher', 'debit_card', 'not_defined']
               config:
                 severity: warn
 

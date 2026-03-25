@@ -27,14 +27,12 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO', 'NA']
+              values: ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO', 'NA']
 
       - name: geolocation_key
         description: "The foreign key linking to the dim__geolocation dimension."
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('dim_geolocation')
-                field: geolocation_key
+              to: ref('dim_geolocation')
+              field: geolocation_key

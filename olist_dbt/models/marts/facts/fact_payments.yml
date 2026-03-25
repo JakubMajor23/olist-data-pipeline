@@ -15,7 +15,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('fact_orders')
               field: order_id
 
@@ -23,7 +22,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_payment_type')
               field: payment_type_key
 
@@ -32,7 +30,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_date')
               field: data_key
 

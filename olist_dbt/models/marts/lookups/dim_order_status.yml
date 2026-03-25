@@ -17,7 +17,7 @@ models:
           - unique
           - not_null
           - accepted_values:
-              values: ['delivered', 'shipped', 'canceled', 'invoiced', 'processing', 'approved', 'unavailable', 'created']
+              values: ['delivered', 'shipped', 'canceled', 'invoiced', 'processing', 'approved', 'unavailable', 'created', 'unknown']
 
       - name: is_final_status
         description: "Boolean flag (TRUE/FALSE) indicating if this is a terminal status for an order."

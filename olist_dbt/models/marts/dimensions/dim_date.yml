@@ -47,8 +47,7 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'N/A']
+              values: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'N/A']
 
       - name: day_of_month
         description: "Day of the month (1-31). NULL for the '0' key row."
@@ -77,13 +76,11 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'N/A']
+              values: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'N/A']
 
       - name: is_weekend
         description: "Boolean flag, TRUE if the day is a Saturday or Sunday."
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: [True, False]
+              values: [True, False]

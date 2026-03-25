@@ -5,21 +5,20 @@ olist_project:
     local:
       type: postgres
       threads: 1
-      host: localhost
-      port: 5434            
-      user: olist
-      password: olist       
-      dbname: olist_dwh
+      host: "{{ env_var('DWH_POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('DWH_POSTGRES_PORT', '5434') | int }}"
+      user: "{{ env_var('POSTGRES_USER', 'dwh_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'dwh_pass') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'dwh') }}"
       schema: dwh_main_dev  
 
     docker:
       type: postgres
       threads: 4
-      host: postgres-dwh  
-      port: 5432            
-
-      user: "{{ env_var('POSTGRES_USER', 'olist') }}"
-      password: "{{ env_var('POSTGRES_PASSWORD', 'olist') }}" 
-      dbname: "{{ env_var('POSTGRES_DB', 'olist_dwh') }}"
+      host: "{{ env_var('DWH_POSTGRES_DOCKER_HOST', 'postgres-dwh') }}"
+      port: "{{ env_var('DWH_POSTGRES_DOCKER_PORT', '5432') | int }}"
+      user: "{{ env_var('POSTGRES_USER', 'dwh_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'dwh_pass') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'dwh') }}"
 
       schema: main

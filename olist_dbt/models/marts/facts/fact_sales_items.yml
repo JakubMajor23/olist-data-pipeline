@@ -15,7 +15,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('fact_orders')
               field: order_id
 
@@ -28,7 +27,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_products')
               field: product_key
 
@@ -36,7 +34,6 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
               to: ref('dim_sellers')
               field: seller_key
 
