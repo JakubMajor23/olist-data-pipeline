@@ -29,39 +29,30 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
 
-      - name: Install dbt
-        run: pip install dbt-postgres
-
-      - name: Configure dbt profile
+      - name: Install pinned dependencies
         run: |
-          mkdir -p ~/.dbt
-          cat <<EOF > ~/.dbt/profiles.yml
-          olist_project:
-            target: dev
-            outputs:
-              dev:
-                type: postgres
-                host: localhost
-                user: user
-                password: password
-                port: 5432
-                dbname: dwh
-                schema: raw_data
-                threads: 1
-          EOF
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Generate Docs
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: dwh
+          DWH_POSTGRES_DOCKER_HOST: localhost
+          DWH_POSTGRES_DOCKER_PORT: 5432
         run: |
-          cd olist_dbt
-          dbt deps --profiles-dir ~/.dbt
-          dbt docs generate --profiles-dir ~/.dbt
+          dbt deps --project-dir olist_dbt --profiles-dir olist_dbt
+          dbt docs generate --project-dir olist_dbt --profiles-dir olist_dbt --target docker
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
