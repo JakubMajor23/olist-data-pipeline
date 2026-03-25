@@ -8,7 +8,7 @@ with all_values as (
         is_valid_brazilian_location as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."dim_geolocation"
+    from "dwh"."main"."dim_geolocation"
     group by is_valid_brazilian_location
 
 )

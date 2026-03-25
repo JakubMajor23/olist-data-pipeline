@@ -4,13 +4,13 @@
 
 with child as (
     select geolocation_key as from_field
-    from "dwh"."raw_data"."dim_sellers"
+    from "dwh"."main"."dim_sellers"
     where geolocation_key is not null
 ),
 
 parent as (
     select geolocation_key as to_field
-    from "dwh"."raw_data"."dim_geolocation"
+    from "dwh"."main"."dim_geolocation"
 )
 
 select

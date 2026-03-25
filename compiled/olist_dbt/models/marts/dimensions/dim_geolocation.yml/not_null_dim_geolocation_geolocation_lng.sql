@@ -5,7 +5,7 @@
 
 
 select geolocation_lng
-from (select * from "dwh"."raw_data"."dim_geolocation" where is_valid_brazilian_location = TRUE) dbt_subquery
+from (select * from "dwh"."main"."dim_geolocation" where is_valid_brazilian_location = TRUE) dbt_subquery
 where geolocation_lng is null
 
 

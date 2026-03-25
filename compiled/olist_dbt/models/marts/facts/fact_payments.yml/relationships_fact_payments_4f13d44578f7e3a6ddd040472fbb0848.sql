@@ -4,13 +4,13 @@
 
 with child as (
     select order_id as from_field
-    from "dwh"."raw_data"."fact_payments"
+    from "dwh"."main"."fact_payments"
     where order_id is not null
 ),
 
 parent as (
     select order_id as to_field
-    from "dwh"."raw_data"."fact_orders"
+    from "dwh"."main"."fact_orders"
 )
 
 select

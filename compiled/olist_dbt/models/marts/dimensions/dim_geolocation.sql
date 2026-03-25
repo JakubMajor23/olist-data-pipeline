@@ -1,5 +1,5 @@
 WITH stg_geolocation AS (
-    SELECT * FROM "dwh"."raw_data"."stg__geolocation"
+    SELECT * FROM "dwh"."main"."stg__geolocation"
 ),
 
 aggregated_coords AS (

@@ -4,13 +4,13 @@
 
 with child as (
     select order_estimated_delivery_date_key as from_field
-    from "dwh"."raw_data"."fact_orders"
+    from "dwh"."main"."fact_orders"
     where order_estimated_delivery_date_key is not null
 ),
 
 parent as (
     select data_key as to_field
-    from "dwh"."raw_data"."dim_date"
+    from "dwh"."main"."dim_date"
 )
 
 select

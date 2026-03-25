@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."fact_orders"
+    from "dwh"."main"."fact_orders"
     
 
 ),

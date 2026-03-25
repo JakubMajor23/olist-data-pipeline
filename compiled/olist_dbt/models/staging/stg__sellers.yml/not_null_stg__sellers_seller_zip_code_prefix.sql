@@ -5,7 +5,7 @@
 
 
 select seller_zip_code_prefix
-from "dwh"."raw_data"."stg__sellers"
+from "dwh"."main"."stg__sellers"
 where seller_zip_code_prefix is null
 
 

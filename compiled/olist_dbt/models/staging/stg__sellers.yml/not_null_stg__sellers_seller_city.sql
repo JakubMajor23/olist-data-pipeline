@@ -5,7 +5,7 @@
 
 
 select seller_city
-from "dwh"."raw_data"."stg__sellers"
+from "dwh"."main"."stg__sellers"
 where seller_city is null
 
 

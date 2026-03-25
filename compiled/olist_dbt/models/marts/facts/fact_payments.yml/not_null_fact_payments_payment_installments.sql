@@ -5,7 +5,7 @@
 
 
 select payment_installments
-from "dwh"."raw_data"."fact_payments"
+from "dwh"."main"."fact_payments"
 where payment_installments is null
 
 

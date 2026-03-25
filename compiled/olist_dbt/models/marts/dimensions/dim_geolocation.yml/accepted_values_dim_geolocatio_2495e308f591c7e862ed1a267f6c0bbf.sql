@@ -8,7 +8,7 @@ with all_values as (
         geolocation_state as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."dim_geolocation"
+    from "dwh"."main"."dim_geolocation"
     group by geolocation_state
 
 )

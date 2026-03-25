@@ -5,7 +5,7 @@
 
 
 select seller_id
-from "dwh"."raw_data"."stg__sellers"
+from "dwh"."main"."stg__sellers"
 where seller_id is null
 
 

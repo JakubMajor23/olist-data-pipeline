@@ -1,5 +1,5 @@
 WITH seed_data AS (
-    SELECT * FROM "dwh"."raw_data"."order_statuses"
+    SELECT * FROM "dwh"."main"."order_statuses"
 )
 
 SELECT

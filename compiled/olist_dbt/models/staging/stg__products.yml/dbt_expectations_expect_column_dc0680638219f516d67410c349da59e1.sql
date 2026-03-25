@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."stg__products"
+    from "dwh"."main"."stg__products"
     
 
 ),

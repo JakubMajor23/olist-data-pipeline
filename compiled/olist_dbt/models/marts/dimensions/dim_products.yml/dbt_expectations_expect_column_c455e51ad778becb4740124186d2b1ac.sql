@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."dim_products"
+    from "dwh"."main"."dim_products"
     
 
 ),

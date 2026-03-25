@@ -8,7 +8,7 @@ with all_values as (
         payment_type as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."stg__payments"
+    from "dwh"."main"."stg__payments"
     group by payment_type
 
 )

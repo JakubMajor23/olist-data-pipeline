@@ -8,7 +8,7 @@ with all_values as (
         is_approval_date_imputed as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."stg__orders"
+    from "dwh"."main"."stg__orders"
     group by is_approval_date_imputed
 
 )

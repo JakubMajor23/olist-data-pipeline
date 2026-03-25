@@ -8,7 +8,7 @@ with all_values as (
         seller_state as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."stg__sellers"
+    from "dwh"."main"."stg__sellers"
     group by seller_state
 
 )

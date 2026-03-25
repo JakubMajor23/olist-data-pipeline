@@ -4,13 +4,13 @@
 
 with child as (
     select product_id as from_field
-    from "dwh"."raw_data"."stg__order_items"
+    from "dwh"."main"."stg__order_items"
     where product_id is not null
 ),
 
 parent as (
     select product_id as to_field
-    from "dwh"."raw_data"."stg__products"
+    from "dwh"."main"."stg__products"
 )
 
 select

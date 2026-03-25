@@ -9,7 +9,7 @@ with a as (
       
       1 as id_dbtutils_test_equal_rowcount,
       count(*) as count_a 
-    from "dwh"."raw_data"."dim_sellers"
+    from "dwh"."main"."dim_sellers"
     group by id_dbtutils_test_equal_rowcount
 
 
@@ -20,7 +20,7 @@ b as (
       
       1 as id_dbtutils_test_equal_rowcount,
       count(*) as count_b 
-    from "dwh"."raw_data"."stg__sellers"
+    from "dwh"."main"."stg__sellers"
     group by id_dbtutils_test_equal_rowcount
 
 ),

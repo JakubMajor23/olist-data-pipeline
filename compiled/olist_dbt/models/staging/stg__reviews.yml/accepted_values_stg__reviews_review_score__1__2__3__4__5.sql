@@ -8,7 +8,7 @@ with all_values as (
         review_score as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."stg__reviews"
+    from "dwh"."main"."stg__reviews"
     group by review_score
 
 )

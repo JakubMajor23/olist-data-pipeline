@@ -4,13 +4,13 @@
 
 with child as (
     select customer_key as from_field
-    from "dwh"."raw_data"."fact_orders"
+    from "dwh"."main"."fact_orders"
     where customer_key is not null
 ),
 
 parent as (
     select customer_key as to_field
-    from "dwh"."raw_data"."dim_customers"
+    from "dwh"."main"."dim_customers"
 )
 
 select

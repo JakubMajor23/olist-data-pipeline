@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."dim_date"
+    from "dwh"."main"."dim_date"
     
 
 ),

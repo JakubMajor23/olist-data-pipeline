@@ -8,7 +8,7 @@ with all_values as (
         day_of_week_name as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."dim_date"
+    from "dwh"."main"."dim_date"
     group by day_of_week_name
 
 )

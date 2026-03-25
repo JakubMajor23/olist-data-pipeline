@@ -4,13 +4,13 @@
 
 with child as (
     select payment_type_key as from_field
-    from "dwh"."raw_data"."fact_payments"
+    from "dwh"."main"."fact_payments"
     where payment_type_key is not null
 ),
 
 parent as (
     select payment_type_key as to_field
-    from "dwh"."raw_data"."dim_payment_type"
+    from "dwh"."main"."dim_payment_type"
 )
 
 select

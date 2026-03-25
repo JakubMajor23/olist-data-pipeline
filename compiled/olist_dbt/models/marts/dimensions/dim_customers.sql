@@ -6,7 +6,7 @@ WITH stg_customers AS (
         customer_city,
         customer_state
     FROM
-        "dwh"."raw_data"."stg__customers"
+        "dwh"."main"."stg__customers"
 ),
 
 stg_orders AS (
@@ -15,7 +15,7 @@ stg_orders AS (
         customer_id,
         order_purchase_timestamp
     FROM
-        "dwh"."raw_data"."stg__orders"
+        "dwh"."main"."stg__orders"
 ),
 
 customer_orders_with_date AS (
@@ -56,7 +56,7 @@ SELECT
 
 FROM
     deduplicated_customers AS dc
-LEFT JOIN "dwh"."raw_data"."dim_geolocation" AS g
+LEFT JOIN "dwh"."main"."dim_geolocation" AS g
     ON dc.customer_zip_code_prefix = g.geolocation_zip_code_prefix
 WHERE
     dc.rn = 1

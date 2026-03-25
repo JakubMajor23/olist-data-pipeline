@@ -5,7 +5,7 @@
 
 
 select is_weekend
-from "dwh"."raw_data"."dim_date"
+from "dwh"."main"."dim_date"
 where is_weekend is null
 
 

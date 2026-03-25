@@ -1,9 +1,9 @@
 WITH stg_sellers AS (
-    SELECT * FROM "dwh"."raw_data"."stg__sellers"
+    SELECT * FROM "dwh"."main"."stg__sellers"
 ),
 
 dim_geolocation AS (
-    SELECT * FROM "dwh"."raw_data"."dim_geolocation"
+    SELECT * FROM "dwh"."main"."dim_geolocation"
 )
 
 SELECT

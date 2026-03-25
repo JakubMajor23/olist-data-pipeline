@@ -7,7 +7,7 @@ with validation_errors as (
     select
         order_id,order_item_id,
         count(*) as "n_records"
-    from "dwh"."raw_data"."stg__order_items"
+    from "dwh"."main"."stg__order_items"
     where
         1=1
         and 

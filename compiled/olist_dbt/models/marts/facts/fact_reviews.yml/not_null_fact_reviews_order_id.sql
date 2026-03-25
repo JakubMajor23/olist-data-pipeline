@@ -5,7 +5,7 @@
 
 
 select order_id
-from "dwh"."raw_data"."fact_reviews"
+from "dwh"."main"."fact_reviews"
 where order_id is null
 
 

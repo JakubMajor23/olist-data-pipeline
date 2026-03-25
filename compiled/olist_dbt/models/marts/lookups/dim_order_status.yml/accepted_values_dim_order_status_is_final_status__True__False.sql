@@ -8,7 +8,7 @@ with all_values as (
         is_final_status as value_field,
         count(*) as n_records
 
-    from "dwh"."raw_data"."dim_order_status"
+    from "dwh"."main"."dim_order_status"
     group by is_final_status
 
 )

@@ -5,7 +5,7 @@
 
 
 select order_purchase_timestamp
-from "dwh"."raw_data"."stg__orders"
+from "dwh"."main"."stg__orders"
 where order_purchase_timestamp is null
 
 

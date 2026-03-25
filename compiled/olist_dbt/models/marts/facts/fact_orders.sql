@@ -1,20 +1,20 @@
 WITH stg_orders AS (
-    SELECT * FROM "dwh"."raw_data"."stg__orders"
+    SELECT * FROM "dwh"."main"."stg__orders"
 ),
 
 stg_customers AS (
     SELECT
         customer_id,
         customer_unique_id
-    FROM "dwh"."raw_data"."stg__customers"
+    FROM "dwh"."main"."stg__customers"
 ),
 
 stg_order_items AS (
-    SELECT * FROM "dwh"."raw_data"."stg__order_items"
+    SELECT * FROM "dwh"."main"."stg__order_items"
 ),
 
 dim_date AS (
-    SELECT * FROM "dwh"."raw_data"."dim_date"
+    SELECT * FROM "dwh"."main"."dim_date"
 ),
 
 order_totals AS (
@@ -46,10 +46,10 @@ LEFT JOIN order_totals AS ot ON o.order_id = ot.order_id
 
 LEFT JOIN stg_customers AS sc ON o.customer_id = sc.customer_id
 LEFT JOIN
-    "dwh"."raw_data"."dim_customers" AS cust
+    "dwh"."main"."dim_customers" AS cust
     ON sc.customer_unique_id = cust.customer_unique_id
 LEFT JOIN
-    "dwh"."raw_data"."dim_order_status" AS stat
+    "dwh"."main"."dim_order_status" AS stat
     ON o.order_status = stat.order_status
 
 LEFT JOIN

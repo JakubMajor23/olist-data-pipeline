@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."stg__order_items"
+    from "dwh"."main"."stg__order_items"
     
 
 ),

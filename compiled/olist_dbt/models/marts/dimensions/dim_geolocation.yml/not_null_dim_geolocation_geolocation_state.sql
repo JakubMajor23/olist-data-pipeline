@@ -5,7 +5,7 @@
 
 
 select geolocation_state
-from "dwh"."raw_data"."dim_geolocation"
+from "dwh"."main"."dim_geolocation"
 where geolocation_state is null
 
 

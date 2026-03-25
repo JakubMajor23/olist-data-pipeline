@@ -16,7 +16,7 @@
  as expression
 
 
-    from "dwh"."raw_data"."stg__payments"
+    from "dwh"."main"."stg__payments"
     
 
 ),

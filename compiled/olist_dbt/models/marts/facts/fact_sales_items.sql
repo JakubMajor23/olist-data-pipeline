@@ -1,5 +1,5 @@
 WITH stg_order_items AS (
-    SELECT * FROM "dwh"."raw_data"."stg__order_items"
+    SELECT * FROM "dwh"."main"."stg__order_items"
 )
 
 SELECT
@@ -14,5 +14,5 @@ SELECT
 
 FROM stg_order_items AS oi
 
-LEFT JOIN "dwh"."raw_data"."dim_products" AS prod ON oi.product_id = prod.product_id
-LEFT JOIN "dwh"."raw_data"."dim_sellers" AS sell ON oi.seller_id = sell.seller_id
+LEFT JOIN "dwh"."main"."dim_products" AS prod ON oi.product_id = prod.product_id
+LEFT JOIN "dwh"."main"."dim_sellers" AS sell ON oi.seller_id = sell.seller_id

@@ -1,16 +1,16 @@
 WITH stg__payments AS (
-    SELECT * FROM "dwh"."raw_data"."stg__payments"
+    SELECT * FROM "dwh"."main"."stg__payments"
 ),
 
 stg_orders AS (
     SELECT
         order_id,
         order_purchase_timestamp
-    FROM "dwh"."raw_data"."stg__orders"
+    FROM "dwh"."main"."stg__orders"
 ),
 
 dim_date AS (
-    SELECT * FROM "dwh"."raw_data"."dim_date"
+    SELECT * FROM "dwh"."main"."dim_date"
 )
 
 SELECT
@@ -24,7 +24,7 @@ SELECT
 FROM stg__payments AS op
 LEFT JOIN stg_orders AS o ON op.order_id = o.order_id
 LEFT JOIN
-    "dwh"."raw_data"."dim_payment_type" AS pay_type
+    "dwh"."main"."dim_payment_type" AS pay_type
     ON op.payment_type = pay_type.payment_type
 LEFT JOIN
     dim_date AS dd_purchase

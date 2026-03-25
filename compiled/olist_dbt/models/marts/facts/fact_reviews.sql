@@ -1,5 +1,5 @@
 WITH stg_reviews AS (
-    SELECT * FROM "dwh"."raw_data"."stg__reviews"
+    SELECT * FROM "dwh"."main"."stg__reviews"
 )
 
 SELECT

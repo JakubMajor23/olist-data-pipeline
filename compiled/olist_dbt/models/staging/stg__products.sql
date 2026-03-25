@@ -15,7 +15,7 @@ SELECT
 FROM
     "dwh"."raw_data"."olist_products_dataset" AS p
 LEFT JOIN
-    "dwh"."raw_data"."product_category_name_translation" AS t
+    "dwh"."main"."product_category_name_translation" AS t
     ON
         p.product_category_name = t.product_category_name
 

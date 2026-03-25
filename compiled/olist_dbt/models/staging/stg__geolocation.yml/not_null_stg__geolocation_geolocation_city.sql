@@ -5,7 +5,7 @@
 
 
 select geolocation_city
-from "dwh"."raw_data"."stg__geolocation"
+from "dwh"."main"."stg__geolocation"
 where geolocation_city is null
 
 

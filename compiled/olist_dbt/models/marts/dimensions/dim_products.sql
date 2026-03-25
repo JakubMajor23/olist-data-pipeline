@@ -11,7 +11,7 @@ WITH staging AS (
         s.product_height_cm,
         s.product_width_cm
     FROM
-        "dwh"."raw_data"."stg__products" AS s
+        "dwh"."main"."stg__products" AS s
 )
 
 SELECT * FROM staging
