@@ -1,0 +1,2 @@
+# dim_date.sql uses dbt_utils.date_spine() which the jinja templater cannot resolve
+olist_dbt/models/marts/dimensions/dim_date.sql
