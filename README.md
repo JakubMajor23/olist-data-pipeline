@@ -14,7 +14,7 @@
 ![SQLFluff](https://img.shields.io/badge/SQLFluff-Postgres%20%2B%20dbt-00C7B7?style=for-the-badge)
 ![Power BI](https://img.shields.io/badge/Power%20BI-report-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 
-Portfolio ELT project built around the Olist e-commerce dataset. The repository simulates monthly source-system ingestion into PostgreSQL, loads a raw warehouse layer with Apache Airflow, and transforms the data into analytics models with dbt.
+ELT project built around the Olist e-commerce dataset. The repository simulates monthly source-system ingestion into PostgreSQL, loads a raw warehouse layer with Apache Airflow, and transforms the data into analytics models with dbt.
 
 **Live dbt docs:** <https://jakubmajor23.github.io/olist-data-pipeline/>
 
