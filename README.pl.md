@@ -14,7 +14,7 @@
 ![SQLFluff](https://img.shields.io/badge/SQLFluff-Postgres%20%2B%20dbt-00C7B7?style=for-the-badge)
 ![Power BI](https://img.shields.io/badge/Power%20BI-report-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
 
-Projekt portfolio ELT oparty o dataset Olist. Repozytorium symuluje miesięczny napływ danych do źródłowego PostgreSQL, ładuje warstwę surową hurtowni przez Apache Airflow i buduje modele analityczne w dbt.
+Projekt ELT oparty o dataset Olist. Repozytorium symuluje miesięczny napływ danych do źródłowego PostgreSQL, ładuje warstwę surową hurtowni przez Apache Airflow i buduje modele analityczne w dbt.
 
 **Live dbt docs:** <https://jakubmajor23.github.io/olist-data-pipeline/>
 
