@@ -36,4 +36,4 @@ SELECT
     review_creation_date,
     review_answer_timestamp
 FROM deduplicated
-WHERE rn = 1
+WHERE rn = 1

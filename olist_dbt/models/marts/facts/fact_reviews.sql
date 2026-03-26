@@ -12,4 +12,3 @@ SELECT
     review_creation_date,
     review_answer_timestamp
 FROM stg_reviews
-

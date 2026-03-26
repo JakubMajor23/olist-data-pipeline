@@ -52,6 +52,7 @@ FROM transformed
 
 {% if is_incremental() %}
     WHERE
-        order_purchase_timestamp
+        transformed.order_purchase_timestamp
         > (SELECT MAX(order_purchase_timestamp) FROM {{ this }})
 {% endif %}
+

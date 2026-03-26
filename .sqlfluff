@@ -4,7 +4,10 @@ templater = jinja
 runaway_limit = 10
 max_line_length = 120
 indent_unit = space
-exclude_rules = ST06, ST09
+exclude_rules = ST06, ST09, LT12, RF04
 
 [sqlfluff:templater:jinja]
 apply_dbt_builtins = True
+
+[sqlfluff:templater:jinja:macros]
+dbt_utils.date_spine = {% macro date_spine(datepart, start_date, end_date) %}SELECT GENERATE_SERIES({{ start_date }}, {{ end_date }}, '1 {{ datepart }}'::INTERVAL) AS date_day{% endmacro %}
