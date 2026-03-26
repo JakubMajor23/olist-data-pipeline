@@ -1,6 +1,6 @@
 SELECT
     review_id,
-    COUNT(*) AS liczba_wystapien
+    COUNT(*) AS review_count
 FROM
     "dwh"."main"."stg__reviews"
 GROUP BY
@@ -8,4 +8,4 @@ GROUP BY
 HAVING
     COUNT(*) > 1
 ORDER BY
-    liczba_wystapien DESC;
+    review_count DESC;
